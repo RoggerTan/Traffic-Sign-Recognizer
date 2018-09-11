@@ -1,0 +1,15 @@
+﻿@page "/"
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<h1>Blazor is awesome and even better with Blazor Utils</h1>
+<button onclick="@BtnClick">Click me!</button>
+
+@functions{
+    protected void BtnClick(UIMouseEventArgs e)
+    {
+        _("h1").Css("color", "red");
+    }
+}
