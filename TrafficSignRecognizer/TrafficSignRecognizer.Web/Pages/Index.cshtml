@@ -5,11 +5,46 @@
 Welcome to your new app.
 
 <h1>Blazor is awesome and even better with Blazor Utils</h1>
+
+<h2 style="color: @(isRed ? "red" : "black")">This one has state</h2>
+
 <button onclick="@BtnClick">Click me!</button>
+<button id="btn2">This should work, too!</button>
+<button id="btn3" onclick="@BtnClickh2">h2 with Utils!</button>
+<button id="btn4" onclick="@(() => { isRed = true; })">h2 with state!</button>
+<button id="btn5" onclick="@(() => { Console.WriteLine(isRed); })">Show isRed value!</button>
+<button id="btn4" onclick="@(() => { isBlue = true; })">Change to blue!</button>
+<a id="link1" href="https://bing.com">This link shouldn't work</a>
 
 @functions{
+    bool isRed { get; set; } = false;
+    bool isBlue { get; set; } = false;
+
+    protected override async Task OnAfterRenderAsync()
+    {
+        base.OnAfterRender();
+        _("#btn2").On("click", (e) =>
+        {
+            _("h1").Css("color", "red");
+            Console.WriteLine("Changed to red!");
+        });
+
+        _("#link1").On("click", (e) =>
+        {
+            e.PreventDefault();
+            Console.WriteLine("Prevented");
+        });
+
+        Console.WriteLine("Rendered!");
+    }
+
     protected void BtnClick(UIMouseEventArgs e)
     {
         _("h1").Css("color", "red");
+    }
+
+    protected void BtnClickh2()
+    {
+        _("h2").Css("color", "red");
     }
 }
