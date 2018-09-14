@@ -15,10 +15,25 @@ Welcome to your new app.
 <button id="btn5" onclick="@(() => { Console.WriteLine(isRed); })">Show isRed value!</button>
 <button id="btn4" onclick="@(() => { isBlue = true; })">Change to blue!</button>
 <a id="link1" href="https://bing.com">This link shouldn't work</a>
+<button onclick="@(() => { student.Tuoi -= 3; })">Giảm tuổi chó Ý</button>
 
 @functions{
     bool isRed { get; set; } = false;
     bool isBlue { get; set; } = false;
+    Student student;
+
+    class Student
+    {
+        public string Lop = "CL3";
+        public string Ten = "Cho Y";
+        public int Tuoi = 21;
+    }
+
+    protected override void OnInit()
+    {
+        base.OnInit();
+        student = new Student();
+    }
 
     protected override async Task OnAfterRenderAsync()
     {
@@ -29,18 +44,23 @@ Welcome to your new app.
             Console.WriteLine("Changed to red!");
         });
 
+        //.on("click", (e) => {});
+
         _("#link1").On("click", (e) =>
         {
             e.PreventDefault();
             Console.WriteLine("Prevented");
         });
 
-        Console.WriteLine("Rendered!");
+        //Console.WriteLine("Rendered!");
+
+        Dev.Map(student, "SVY");
     }
 
     protected void BtnClick(UIMouseEventArgs e)
     {
         _("h1").Css("color", "red");
+        //$("h1").css("color", "red");
     }
 
     protected void BtnClickh2()
