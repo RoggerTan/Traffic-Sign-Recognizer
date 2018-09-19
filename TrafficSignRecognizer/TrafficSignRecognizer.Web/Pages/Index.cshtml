@@ -20,19 +20,13 @@ Welcome to your new app.
 @functions{
     bool isRed { get; set; } = false;
     bool isBlue { get; set; } = false;
-    Student student;
-
-    class Student
-    {
-        public string Lop = "CL3";
-        public string Ten = "Cho Y";
-        public int Tuoi = 21;
-    }
+    Entities.Student student;
 
     protected override void OnInit()
     {
         base.OnInit();
-        student = new Student();
+        student = new Entities.Student();
+        Dev.Map(student, "SVY");
     }
 
     protected override async Task OnAfterRenderAsync()
@@ -53,8 +47,6 @@ Welcome to your new app.
         });
 
         //Console.WriteLine("Rendered!");
-
-        Dev.Map(student, "SVY");
     }
 
     protected void BtnClick(UIMouseEventArgs e)

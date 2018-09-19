@@ -9,8 +9,8 @@
 
   <ItemGroup>
     <PackageReference Include="LMT.BlazorUtils.Cookie" Version="0.2.2" />
-    <PackageReference Include="LMT.BlazorUtils.Dev" Version="1.0.0" />
-    <PackageReference Include="LMT.BlazorUtils.Dom" Version="0.3.4" />
+    <PackageReference Include="LMT.BlazorUtils.Dev" Version="1.2.0" />
+    <PackageReference Include="LMT.BlazorUtils.Dom" Version="0.3.5" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Browser" Version="0.5.1" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="0.5.1" />
     <DotNetCliToolReference Include="Microsoft.AspNetCore.Blazor.Cli" Version="0.5.1" />
