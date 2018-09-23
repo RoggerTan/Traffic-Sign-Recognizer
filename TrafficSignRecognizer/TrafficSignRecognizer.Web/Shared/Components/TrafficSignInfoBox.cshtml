@@ -1,0 +1,42 @@
+﻿@using TrafficSignRecognizer.Web.Entities.InjectTypes
+
+<LMTLocal>
+    <style>
+        img {
+            display: block;
+            width: 120px;
+            height: 120px;
+        }
+    </style>
+
+    <LMTInjector ref="_apiInj" jsonpath="/json/api.json">
+        <LMTInjector ref="_signInfoInj"
+                     jsonpath="@($"{_apiInj.Get<Api>().Url}/trafficsign/get/{Id}")">
+            @{
+                var foundSign = _signInfoInj.Get<TrafficSignInfo>();
+                LMTBehaviours();
+            }
+            <div lmt-grid="md-3,md-9">
+                <div>
+                    <div>
+                        <img src="@foundSign.ImgUrl" />
+                    </div>
+                    <div>
+                        <h1>@foundSign.Name</h1>
+                        <label>Loại: @foundSign.Type</label>
+                        <label>Mã: @foundSign.Id</label>
+                        <p>@foundSign.Description</p>
+                    </div>
+                </div>
+            </div>
+        </LMTInjector>
+    </LMTInjector>
+</LMTLocal>
+
+@functions{
+    private netstandard2._0.BlazorComponents.LMTInjector _apiInj;
+    private netstandard2._0.BlazorComponents.LMTInjector _signInfoInj;
+
+    [Parameter]
+    private string Id { get; set; }
+}
