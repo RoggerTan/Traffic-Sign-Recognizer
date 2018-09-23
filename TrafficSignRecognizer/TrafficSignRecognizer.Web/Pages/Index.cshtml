@@ -1,62 +1,53 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+<LMTLocal>
+    <style>
+        .HeaderBackground {
+            display: table;
+            height: 70vh;
+            width: 100vw;
+            background: url(/img/traffic.jpg);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position-x: center;
+        }
 
-Welcome to your new app.
+            .HeaderBackground h1 {
+                color: white;
+                text-transform: uppercase;
+                z-index: 25;
+                position: absolute;
+                font-weight: lighter;
+                font-size: 70px;
+                margin-top: -115px;
+                user-select: none;
+            }
 
-<h1>Blazor is awesome and even better with Blazor Utils</h1>
+                .HeaderBackground h1 label {
+                    text-transform: uppercase;
+                    vertical-align: text-top;
+                    font-size: 30px;
+                    user-select: none;
+                }
 
-<h2 style="color: @(isRed ? "red" : "black")">This one has state</h2>
+            .HeaderBackground .TitleContainer {
+                display: table-cell;
+                vertical-align: middle;
+            }
+    </style>
 
-<button onclick="@BtnClick">Click me!</button>
-<button id="btn2">This should work, too!</button>
-<button id="btn3" onclick="@BtnClickh2">h2 with Utils!</button>
-<button id="btn4" onclick="@(() => { isRed = true; })">h2 with state!</button>
-<button id="btn5" onclick="@(() => { Console.WriteLine(isRed); })">Show isRed value!</button>
-<button id="btn4" onclick="@(() => { isBlue = true; })">Change to blue!</button>
-<a id="link1" href="https://bing.com">This link shouldn't work</a>
-<button onclick="@(() => { student.Tuoi -= 3; })">Giảm tuổi chó Ý</button>
+    <div class="HeaderBackground" lmt-filter="#000,0.6">
+        <div class="TitleContainer">
+            <h1>Tra cứu<br />Biển báo giao thông<label>Beta</label></h1>
+        </div>
+    </div>
+
+    <ImageDropArea/>
+</LMTLocal>
 
 @functions{
-    bool isRed { get; set; } = false;
-    bool isBlue { get; set; } = false;
-    Entities.Student student;
-
-    protected override void OnInit()
-    {
-        base.OnInit();
-        student = new Entities.Student();
-        Dev.Map(student, "SVY");
-    }
-
     protected override async Task OnAfterRenderAsync()
     {
-        base.OnAfterRender();
-        _("#btn2").On("click", (e) =>
-        {
-            _("h1").Css("color", "red");
-            Console.WriteLine("Changed to red!");
-        });
-
-        //.on("click", (e) => {});
-
-        _("#link1").On("click", (e) =>
-        {
-            e.PreventDefault();
-            Console.WriteLine("Prevented");
-        });
-
-        //Console.WriteLine("Rendered!");
-    }
-
-    protected void BtnClick(UIMouseEventArgs e)
-    {
-        _("h1").Css("color", "red");
-        //$("h1").css("color", "red");
-    }
-
-    protected void BtnClickh2()
-    {
-        _("h2").Css("color", "red");
+        LMTBehaviours();
     }
 }

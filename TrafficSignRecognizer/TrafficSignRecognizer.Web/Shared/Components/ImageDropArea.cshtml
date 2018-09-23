@@ -1,0 +1,62 @@
+﻿<LMTLocal>
+    <style>
+        .ImageDropArea {
+            display: table;
+            height: 25vh;
+            width: 70vw;
+            border: 4px dashed #707070;
+            margin-top: 5px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+            .ImageDropArea label {
+                font-size: 30px;
+                display: table-cell;
+                vertical-align: middle;
+                font-weight: lighter;
+                text-align: center;
+            }
+
+            .ImageDropArea .DroppedImageContainer {
+                display: table-cell;
+                vertical-align: middle;
+                margin-left: 5px;
+                margin-right: 5px;
+            }
+
+                .ImageDropArea .DroppedImageContainer .DroppedImage {
+                    width: 20vh;
+                    height: 20vh;
+                    display: inline-block;
+                }
+    </style>
+    <LMTDropArea class="ImageDropArea" ondrop="@ImageDropHandler">
+        @if (ListDropEventArgs.Count == 0)
+        {
+            <label>Kéo thả ảnh của bạn vào đây!</label>
+        }
+        else
+        {
+            <span class="DroppedImageContainer">
+                @foreach (var e in ListDropEventArgs)
+                {
+                <img class="DroppedImage" src="@e.DataUrl" />
+                }
+            </span>
+        }
+    </LMTDropArea>
+</LMTLocal>
+
+@functions{
+    private List<LMTDropEventArgs> ListDropEventArgs = new List<LMTDropEventArgs>();
+
+    private void ImageDropHandler(LMTDropEventArgs e)
+    {
+        if (e.DataUrl == null) return;
+
+        ListDropEventArgs.Add(e);
+
+        StateHasChanged();
+    }
+}

@@ -1,4 +1,4 @@
-﻿//LMT Blazor Utils 0.3.2
+﻿//LMT Blazor Utils 0.4.1
 //If a jQuery method has both get and set function, add number 2 after function name of the "get" one
 
 window.blazorUtils = {};
@@ -54,6 +54,38 @@ function LMTCookieBoot() {
 
   Blazor.registerFunction("LMTCookiesAdd", function(key, value, exp, path) {
     setCookie(key, value, exp, path);
+  });
+
+  Blazor.registerFunction("LocalStorageGet", key => {
+    return localStorage.getItem(key);
+  });
+
+  Blazor.registerFunction("LocalStorageSet", (key, value) => {
+    localStorage.setItem(key, value);
+  });
+
+  Blazor.registerFunction("LocalStorageRemove", key => {
+    localStorage.removeItem(key);
+  });
+
+  Blazor.registerFunction("LocalStorageClear", () => {
+    localStorage.clear();
+  });
+
+  Blazor.registerFunction("SessionStorageGet", key => {
+    return sessionStorage.getItem(key);
+  });
+
+  Blazor.registerFunction("SessionStorageSet", (key, value) => {
+    sessionStorage.setItem(key, value);
+  });
+
+  Blazor.registerFunction("SessionStorageRemove", key => {
+    sessionStorage.removeItem(key);
+  });
+
+  Blazor.registerFunction("SessionStorageClear", () => {
+    sessionStorage.clear();
   });
 }
 
@@ -376,6 +408,31 @@ function LMTDomBoot() {
     return false;
   };
 
+  let BlazorUtilsCallCSUICallBackWithStringData = (id, data) => {
+    const assemblyName = "BlazorUtils.Dom";
+    const namespace = "BlazorUtils.Dom.Storages";
+    const typeName = "UICallBacksStorage";
+    const methodName = "InvokeWithStringData";
+
+    const method = Blazor.platform.findMethod(
+      assemblyName,
+      namespace,
+      typeName,
+      methodName
+    );
+
+    let csid = Blazor.platform.toDotNetString(id);
+    let csdata = Blazor.platform.toDotNetString(data);
+
+    let result = Blazor.platform.toJavaScriptString(
+      Blazor.platform.callMethod(method, null, [csid, csdata])
+    );
+    if (result == "True") {
+      return true;
+    }
+    return false;
+  };
+
   // ReSharper disable once InconsistentNaming
   let BlazorUtilsCallIntStringString = (id, ind, className) => {
     const assemblyName = "BlazorUtils.Dom";
@@ -483,7 +540,13 @@ function LMTDomBoot() {
 
   //Pure Js
   Blazor.registerFunction("LMTDomEval", function(jsCode) {
-    eval(jsCode);
+    let result = eval(jsCode);
+    let resultType = typeof result;
+    return resultType == "function" ||
+      result === undefined ||
+      resultType == "date"
+      ? null
+      : result;
   });
 
   //jQuery
@@ -546,18 +609,27 @@ function LMTDomBoot() {
       let result = false;
       if (e.originalEvent && e.originalEvent.dataTransfer) {
         e.preventDefault();
-        let files = e.originalEvent.dataTransfer.files;
-        for (var i = 0, f; (f = files[i]); i++) {
-          let fileReader = new FileReader();
-          fileReader.file = f;
-          fileReader.readAsDataURL(f);
-          fileReader.onload = function() {
-            BlazorUtilsCallCSUICallBackWithFileData(
+        if (e.type == "drop") {
+          let files = e.originalEvent.dataTransfer.files;
+          if (files.length != 0) {
+            for (var i = 0, f; (f = files[i]); i++) {
+              let fileReader = new FileReader();
+              fileReader.file = f;
+              fileReader.readAsDataURL(f);
+              fileReader.onload = function() {
+                BlazorUtilsCallCSUICallBackWithFileData(
+                  handler,
+                  fileReader.result,
+                  fileReader.file
+                );
+              };
+            }
+          } else {
+            BlazorUtilsCallCSUICallBackWithStringData(
               handler,
-              fileReader.result,
-              fileReader.file
+              e.originalEvent.dataTransfer.getData("text")
             );
-          };
+          }
         }
       } else {
         result = BlazorUtilsCallCSUICallBack(handler);
