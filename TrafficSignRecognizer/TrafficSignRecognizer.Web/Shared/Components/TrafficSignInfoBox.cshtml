@@ -1,42 +1,39 @@
-﻿@using TrafficSignRecognizer.Web.Entities.InjectTypes
+﻿@using Entities.InjectTypes
 
 <LMTLocal>
     <style>
         img {
             display: block;
-            width: 120px;
-            height: 120px;
+            width: 100%;
+            height: 100%;
         }
+
+        .TrafficSignInfo {
+            margin-top: 20px;
+        }
+
+            .TrafficSignInfo .Info {
+                border: 4px dashed #707070;
+                padding-top: 5px;
+            }
     </style>
 
-    <LMTInjector ref="_apiInj" jsonpath="/json/api.json">
-        <LMTInjector ref="_signInfoInj"
-                     jsonpath="@($"{_apiInj.Get<Api>().Url}/trafficsign/get/{Id}")">
-            @{
-                var foundSign = _signInfoInj.Get<TrafficSignInfo>();
-                LMTBehaviours();
-            }
-            <div lmt-grid="md-3,md-9">
+        <div lmt-grid="md-3,md-9" class="TrafficSignInfo">
+            <div>
                 <div>
-                    <div>
-                        <img src="@foundSign.ImgUrl" />
-                    </div>
-                    <div>
-                        <h1>@foundSign.Name</h1>
-                        <label>Loại: @foundSign.Type</label>
-                        <label>Mã: @foundSign.Id</label>
-                        <p>@foundSign.Description</p>
-                    </div>
+                    <img src="@trafficsign.ImgUrl" />
+                </div>
+                <div class="Info">
+                    <h1>@trafficsign.Name</h1>
+                    <label>Loại: @trafficsign.Type</label><br />
+                    <label>Mã: @trafficsign.Id</label><br />
+                    <p>@trafficsign.Description</p>
                 </div>
             </div>
-        </LMTInjector>
-    </LMTInjector>
+        </div>
 </LMTLocal>
 
 @functions{
-    private netstandard2._0.BlazorComponents.LMTInjector _apiInj;
-    private netstandard2._0.BlazorComponents.LMTInjector _signInfoInj;
-
     [Parameter]
-    private string Id { get; set; }
+    private TrafficSignInfo trafficsign { get; set; }
 }

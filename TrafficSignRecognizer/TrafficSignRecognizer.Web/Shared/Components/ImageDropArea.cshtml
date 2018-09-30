@@ -4,10 +4,14 @@
             display: table;
             height: 25vh;
             width: 70vw;
-            border: 4px dashed #707070;
+            /*border: 4px dashed #707070;*/
             margin-top: 5px;
             margin-left: auto;
             margin-right: auto;
+            background-image: repeating-linear-gradient(to right, #707070 0%, #707070 50%, transparent 0%, transparent 100%), repeating-linear-gradient(to right, #707070 0%, #707070 50%, transparent 0%, transparent 100%), repeating-linear-gradient(to bottom, #707070 0%, #707070 50%, transparent 0%, transparent 100%), repeating-linear-gradient(to bottom, #707070 0%, #707070 50%, transparent 0%, transparent 100%);
+            background-position: left top, left bottom, left top, right top;
+            background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+            background-size: 50px 3px, 50px 3px, 3px 50px, 3px 50px;
         }
 
             .ImageDropArea label {
@@ -49,13 +53,18 @@
 </LMTLocal>
 
 @functions{
-    private List<LMTDropEventArgs> ListDropEventArgs = new List<LMTDropEventArgs>();
+    [Parameter]
+    private EventHandler<LMTDropEventArgs> ondrop { get; set; }
+
+    public List<LMTDropEventArgs> ListDropEventArgs = new List<LMTDropEventArgs>();
 
     private void ImageDropHandler(LMTDropEventArgs e)
     {
         if (e.DataUrl == null) return;
 
         ListDropEventArgs.Add(e);
+
+        ondrop?.Invoke(this, e);
 
         StateHasChanged();
     }

@@ -42,14 +42,40 @@
         </div>
     </div>
 
-    <ImageDropArea/>
+    <ImageDropArea ondrop="@ImageDropHandler" />
 
-    <TrafficSignInfoBox Id="130"/>
+    <LMTInjector ref="apiInfo" jsonpath="/json/api.json">
+        @foreach (var trafficSignInfo in trafficSignInfos)
+        {
+            <TrafficSignInfoBox trafficsign="@trafficSignInfo" />
+        }
+    </LMTInjector>
 </LMTLocal>
 
+@using Entities.InjectTypes;
+@inject HttpClient httpClient;
+
 @functions{
+    private List<TrafficSignInfo> trafficSignInfos = new List<TrafficSignInfo>();
+    private netstandard2._0.BlazorComponents.LMTInjector apiInfo;
+
     protected override async Task OnAfterRenderAsync()
     {
         LMTBehaviours();
+    }
+
+    private async void ImageDropHandler(object component, LMTDropEventArgs e)
+    {
+        try
+        {
+            var result = await httpClient.PostJsonAsync<TrafficSignInfo>($"{apiInfo.Get<Api>().Url}/get", new { base64 = e.Base64String });
+            if (result == null) Dev.Warn("Result is null!");
+            trafficSignInfos.Add(result);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Dev.Error(ex.Message);
+        }
     }
 }
