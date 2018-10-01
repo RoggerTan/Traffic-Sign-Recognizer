@@ -8,6 +8,7 @@ namespace TrafficSignRecognizer.API.Controllers
     [ApiController]
     public class TestController : ControllerBase
     {
+        [HttpPost("tograyscale")]
         public IActionResult ToGrayScale([FromBody] Base64Image img)
         {
             return new JsonResult(img.Base64

@@ -1,7 +1,35 @@
 ﻿@page "/test"
 
+<LMTLocal>
+    <style>
+        .dropArea, _(id) img{
+            display: block;
+            width: 300px;
+            height: 300px;
+            border: 2px solid black;
+        }
+    </style>
+    <LMTInjector jsonpath="/json/api.json" ref="@apiInfo">
+        <LMTDropArea class="dropArea" ondrop="@ImageDropHandler">
 
+        </LMTDropArea>
+    </LMTInjector>
+
+    <img src="@($"data:image/png;base64,{grayscaledImage?.Base64}")"/>
+</LMTLocal>
+
+@inject HttpClient httpClient;
+@using Interfaces.Entities;
+@using Entities.InjectTypes;
 
 @functions{
+    private netstandard2._0.BlazorComponents.LMTInjector apiInfo;
+    private Base64Image grayscaledImage;
 
+    private async void ImageDropHandler(LMTDropEventArgs e)
+    {
+        Dev.Warn($"{apiInfo.Get<Api>().TestUrl}/tograyscale");
+        grayscaledImage = await httpClient.PostJsonAsync<Base64Image>($"{apiInfo.Get<Api>().TestUrl}/tograyscale", new Base64Image { Base64 = e.Base64String});
+        StateHasChanged();
+    }
 }

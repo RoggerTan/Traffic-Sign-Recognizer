@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -55,12 +57,15 @@ namespace TrafficSignRecognizer.API.Models.Utils
 
         public static Base64Image ToBase64Image(this Bitmap bitmap)
         {
-            MemoryStream stream = null;
-            binaryFormatter.Serialize(stream, bitmap);
-            return new Base64Image
+            using (var stream = new MemoryStream())
             {
-                Base64 = Convert.ToBase64String(stream.ToArray())
-            };
+                bitmap.Save(stream, ImageFormat.Jpeg);
+
+                return new Base64Image
+                {
+                    Base64 = Convert.ToBase64String(stream.ToArray())
+                };
+            }
         }
     }
 }
