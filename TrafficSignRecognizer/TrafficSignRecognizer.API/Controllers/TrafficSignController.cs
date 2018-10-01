@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Drawing;
+using System.IO;
+using TrafficSignRecognizer.Interfaces.Entities;
 
 namespace TrafficSignRecognizer.API.Controllers
 {
@@ -14,10 +11,10 @@ namespace TrafficSignRecognizer.API.Controllers
     public class TrafficSignController : ControllerBase
     {
         [HttpPost("get")]
-        public IActionResult Get([FromBody]dynamic img)
+        public IActionResult Get([FromBody]Base64Image img)
         {
             if (img == null) return NoContent();
-            var imgStream = new Bitmap(new MemoryStream(Convert.FromBase64String(img["base64"].Value)));
+            var imgStream = new Bitmap(new MemoryStream(Convert.FromBase64String(img.Base64)));
             return new JsonResult(new {
                 ImgUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/jpg/example.jpg",
                 Name = "CẤM DỪNG XE VÀ ĐỖ",

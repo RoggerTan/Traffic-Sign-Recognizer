@@ -1,4 +1,5 @@
 {
   "Url": "http://localhost:49376/api/trafficsign",
+  "TestUrl": "http://localhost:49376/api/test",
   "//": ""
 }

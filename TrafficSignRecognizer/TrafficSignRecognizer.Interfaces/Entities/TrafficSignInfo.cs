@@ -1,4 +1,4 @@
-﻿namespace TrafficSignRecognizer.Web.Entities.InjectTypes
+﻿namespace TrafficSignRecognizer.Interfaces.Entities
 {
     public class TrafficSignInfo
     {

@@ -17,4 +17,8 @@
     <DotNetCliToolReference Include="Microsoft.AspNetCore.Blazor.Cli" Version="0.5.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TrafficSignRecognizer.Interfaces\TrafficSignRecognizer.Interfaces.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -53,6 +53,7 @@
 </LMTLocal>
 
 @using Entities.InjectTypes;
+@using Interfaces.Entities;
 @inject HttpClient httpClient;
 
 @functions{
@@ -68,7 +69,7 @@
     {
         try
         {
-            var result = await httpClient.PostJsonAsync<TrafficSignInfo>($"{apiInfo.Get<Api>().Url}/get", new { base64 = e.Base64String });
+            var result = await httpClient.PostJsonAsync<TrafficSignInfo>($"{apiInfo.Get<Api>().Url}/get", new Base64Image { Base64 = e.Base64String });
             if (result == null) Dev.Warn("Result is null!");
             trafficSignInfos.Add(result);
             StateHasChanged();
