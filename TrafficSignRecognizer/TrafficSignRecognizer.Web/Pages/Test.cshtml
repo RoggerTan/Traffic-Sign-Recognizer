@@ -2,10 +2,14 @@
 
 <LMTLocal>
     <style>
-        .dropArea, _(id) img{
+        .dropArea, _(id) img {
             display: block;
             width: 300px;
             height: 300px;
+            border: 2px solid black;
+        }
+
+        table * {
             border: 2px solid black;
         }
     </style>
@@ -15,7 +19,27 @@
         </LMTDropArea>
     </LMTInjector>
 
-    <img src="@($"data:image/png;base64,{grayscaledImage?.Base64}")"/>
+    <img src="@($"data:image/png;base64,{grayscaledImage?.Base64}")" />
+
+    @if (grayscaledImageMatrix != null)
+    {
+        <table>
+            <tbody>
+                @for (var i = 0; i <= matrixToken.CurrentRow; i++)
+                {
+                <tr>
+                    @for (var j = 0; j < grayscaledImageMatrix.Width; j++)
+                    {
+                        <td>
+                            @grayscaledImageMatrix.Value[i][j]
+                        </td>
+                    }
+                </tr>
+                }
+            </tbody>
+        </table>
+    }
+
 </LMTLocal>
 
 @inject HttpClient httpClient;
@@ -25,11 +49,32 @@
 @functions{
     private netstandard2._0.BlazorComponents.LMTInjector apiInfo;
     private Base64Image grayscaledImage;
+    private ImageMatrix grayscaledImageMatrix;
+    private MatrixToken matrixToken;
 
     private async void ImageDropHandler(LMTDropEventArgs e)
     {
-        Dev.Warn($"{apiInfo.Get<Api>().TestUrl}/tograyscale");
-        grayscaledImage = await httpClient.PostJsonAsync<Base64Image>($"{apiInfo.Get<Api>().TestUrl}/tograyscale", new Base64Image { Base64 = e.Base64String});
-        StateHasChanged();
+        var base64Image = new Base64Image { Base64 = e.Base64String };
+
+        grayscaledImage = await httpClient.PostJsonAsync<Base64Image>($"{apiInfo.Get<Api>().TestUrl}/tograyscale", base64Image);
+
+        matrixToken = await httpClient.PostJsonAsync<MatrixToken>($"{apiInfo.Get<Api>().TestUrl}/tomatrix", grayscaledImage);
+
+        grayscaledImageMatrix = new ImageMatrix
+        {
+            Value = new int[matrixToken.RowCount][],
+            Width = matrixToken.ColCount,
+            Height = matrixToken.RowCount
+        };
+
+        for (var CurRow = 0; CurRow < matrixToken.RowCount; CurRow++)
+        {
+            matrixToken.CurrentRow = CurRow;
+            grayscaledImageMatrix.Value[CurRow] = (await httpClient.PostJsonAsync<MatrixToken.MatrixRow>($"{apiInfo.Get<Api>().TestUrl}/getmatrix", matrixToken)).Value;
+            await Task.Delay(500);
+            StateHasChanged();
+        }
+
+        Dev.Warn("Done!");
     }
 }
