@@ -1,8 +1,8 @@
 ﻿@page "/test"
 
-<LMTLocal>
+<LMTLocal ref="_mainLocal">
     <style>
-        .dropArea, _(id) img {
+        .dropArea, #@_mainLocal.id img {
             display: block;
             width: 300px;
             height: 300px;
@@ -13,10 +13,12 @@
             border: 2px solid black;
         }
     </style>
-    <LMTInjector jsonpath="/json/api.json" ref="@apiInfo">
-        <LMTDropArea class="dropArea" ondrop="@ImageDropHandler">
+    <LMTInjector jsonpath="/json/api.json" ref="@apiInfo" type="Api">
+        <LMTTry>
+            <LMTDropArea class="dropArea" ondrop="@ImageDropHandler">
 
-        </LMTDropArea>
+            </LMTDropArea>
+        </LMTTry>
     </LMTInjector>
 
     <img src="@($"data:image/png;base64,{grayscaledImage?.Base64}")" />
@@ -27,14 +29,14 @@
             <tbody>
                 @for (var i = 0; i <= matrixToken.CurrentRow; i++)
                 {
-                <tr>
-                    @for (var j = 0; j < grayscaledImageMatrix.Width; j++)
-                    {
-                        <td>
-                            @grayscaledImageMatrix.Value[i][j]
-                        </td>
-                    }
-                </tr>
+                    <tr>
+                        @for (var j = 0; j < grayscaledImageMatrix.Width; j++)
+                        {
+                            <td>
+                                @grayscaledImageMatrix.Value[i][j]
+                            </td>
+                        }
+                    </tr>
                 }
             </tbody>
         </table>
@@ -47,18 +49,19 @@
 @using Entities.InjectTypes;
 
 @functions{
-    private netstandard2._0.BlazorComponents.LMTInjector apiInfo;
+    private netstandard2._0.BlazorComponents.LMTInjector<Api> apiInfo;
     private Base64Image grayscaledImage;
     private ImageMatrix grayscaledImageMatrix;
     private MatrixToken matrixToken;
+    private netstandard2._0.BlazorComponents.LMTLocal _mainLocal;
 
     private async void ImageDropHandler(LMTDropEventArgs e)
     {
         var base64Image = new Base64Image { Base64 = e.Base64String };
 
-        grayscaledImage = await httpClient.PostJsonAsync<Base64Image>($"{apiInfo.Get<Api>().TestUrl}/tograyscale", base64Image);
+        grayscaledImage = await httpClient.PostJsonAsync<Base64Image>($"{apiInfo.Get().TestUrl}/tograyscale", base64Image);
 
-        matrixToken = await httpClient.PostJsonAsync<MatrixToken>($"{apiInfo.Get<Api>().TestUrl}/tomatrix", grayscaledImage);
+        matrixToken = await httpClient.PostJsonAsync<MatrixToken>($"{apiInfo.Get().TestUrl}/tomatrix", grayscaledImage);
 
         grayscaledImageMatrix = new ImageMatrix
         {
@@ -70,7 +73,7 @@
         for (var CurRow = 0; CurRow < matrixToken.RowCount; CurRow++)
         {
             matrixToken.CurrentRow = CurRow;
-            grayscaledImageMatrix.Value[CurRow] = (await httpClient.PostJsonAsync<MatrixToken.MatrixRow>($"{apiInfo.Get<Api>().TestUrl}/getmatrix", matrixToken)).Value;
+            grayscaledImageMatrix.Value[CurRow] = (await httpClient.PostJsonAsync<MatrixToken.MatrixRow>($"{apiInfo.Get().TestUrl}/getmatrix", matrixToken)).Value;
             await Task.Delay(500);
             StateHasChanged();
         }
