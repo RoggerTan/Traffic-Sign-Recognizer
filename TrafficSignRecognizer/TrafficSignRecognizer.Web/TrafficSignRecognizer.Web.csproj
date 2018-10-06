@@ -12,7 +12,7 @@
     <PackageReference Include="LMT.BlazorUtils.Dev" Version="1.4.0" />
     <PackageReference Include="LMT.BlazorUtils.Dom" Version="0.5.2" />
     <PackageReference Include="LMT.BlazorUtils.Interfaces" Version="0.3.2" />
-    <PackageReference Include="LMT.BlazorUtils.Js" Version="0.4.1" />
+    <PackageReference Include="LMT.BlazorUtils.Js.Bundle" Version="0.4.2.1" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Browser" Version="0.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="0.6.0" />
     <DotNetCliToolReference Include="Microsoft.AspNetCore.Blazor.Cli" Version="0.6.0" />
