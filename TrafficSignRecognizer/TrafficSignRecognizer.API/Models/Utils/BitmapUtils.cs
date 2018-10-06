@@ -2,20 +2,12 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using TrafficSignRecognizer.Interfaces.Entities;
 
 namespace TrafficSignRecognizer.API.Models.Utils
 {
     public static class BitmapUtils
     {
-        private static BinaryFormatter binaryFormatter;
-
-        static BitmapUtils()
-        {
-            binaryFormatter = new BinaryFormatter();
-        }
-
         //Return matrix of pixel for grayscaled bitmap
         public static int[][] AsMatrix(this Bitmap bitmap, int dividend = 1)
         {
@@ -51,6 +43,21 @@ namespace TrafficSignRecognizer.API.Models.Utils
         }
 
         public static Bitmap ToBitmap(this string base64) => new Bitmap(new MemoryStream(Convert.FromBase64String(base64)));
+
+        public static Bitmap ToBitmap(this int[][] matrix)
+        {
+            var image = new Bitmap(matrix.Length, matrix[0].Length);
+
+            for (var i = 0; i < matrix.Length; i++)
+            {
+                for (var j = 0; j < matrix[0].Length; j++)
+                {
+                    image.SetPixel(i, j, Color.FromArgb(matrix[i][j], matrix[i][j], matrix[i][j]));
+                }
+            }
+
+            return image;
+        }
 
         public static Base64Image ToBase64Image(this Bitmap bitmap)
         {
