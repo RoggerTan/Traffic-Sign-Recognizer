@@ -20,17 +20,23 @@ namespace TrafficSignRecognizer.API.Controllers
                 .ToBase64Image());
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data">Data contains Base64Image img and Matrix filter</param>
+        /// <returns></returns>
         [HttpPost("withfilter")]
-        public IActionResult WithFilter([FromBody] Base64Image img)
+        public IActionResult WithFilter([FromBody] dynamic data)
         {
+            int[][] filter = data.filter.ToObject<int[][]>();
+            Base64Image img = data.img.ToObject<Base64Image>();
+
+            var filterMatrix = new Matrix<int>(filter, filter[0].Length, filter.Length);
+
             var convoluteResult = img.Base64
                 .ToBitmap()
                 .AsMatrix()
-                .ConvoluteWith(new int[][]{
-                new[] {1, 1, 1},
-                new[] {0, 0, 0},
-                new[] {-1, -1, -1}
-            });
+                .ConvoluteWith(filterMatrix);
             return new JsonResult(convoluteResult
                 .ToBitmap()
                 .ToBase64Image());

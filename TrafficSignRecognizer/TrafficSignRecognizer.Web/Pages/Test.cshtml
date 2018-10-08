@@ -50,11 +50,11 @@
 @using Entities.InjectTypes;
 
 @functions{
-    private netstandard2._0.BlazorComponents.LMTInjector<Api> apiInfo;
+    private netstandard2._0.BlazorUtilsComponents.LMTInjector<Api> apiInfo;
     private Base64Image grayscaledImage;
     private int[][] grayscaledImageMatrix;
     private MatrixToken matrixToken;
-    private netstandard2._0.BlazorComponents.LMTLocal _mainLocal;
+    private netstandard2._0.BlazorUtilsComponents.LMTLocal _mainLocal;
     private int currentRow = -1;
     private Base64Image filteredImage;
 
@@ -62,9 +62,16 @@
     {
         var base64Image = new Base64Image { Base64 = e.Base64String };
 
+        //grayscale
         grayscaledImage = await httpClient.PostJsonAsync<Base64Image>($"{apiInfo.Get().TestUrl}/tograyscale", base64Image);
 
-        filteredImage = await httpClient.PostJsonAsync<Base64Image>($"{apiInfo.Get().TestUrl}/withfilter", base64Image);
+        //filter
+        var filter = new int[][]{
+            new []{ 1, 1, 1},
+            new [] {0, 0, 0},
+            new []{-1, -1, -1}
+        };
+        filteredImage = await httpClient.PostJsonAsync<Base64Image>($"{apiInfo.Get().TestUrl}/withfilter", new { img = base64Image, filter });
 
         matrixToken = await httpClient.PostJsonAsync<MatrixToken>($"{apiInfo.Get().TestUrl}/tomatrix", grayscaledImage);
 

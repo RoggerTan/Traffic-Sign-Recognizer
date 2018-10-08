@@ -7,13 +7,17 @@ namespace TrafficSignRecognizer.API.Models.Utils
 {
     public static class MatrixUtils
     {
-        public static Matrix<int> ConvoluteWith(this Matrix<int> matrix, int[][] filter)
+        public static Matrix<int> ConvoluteWith(this Matrix<int> matrix, Matrix<int> filter)
         {
+            var filterArray = filter
+                .Select(x => x.ToArray())
+                .ToArray();
+
             //Result matrix's row count
-            var rowCount = matrix.Height / filter.Length;
+            var rowCount = matrix.Height / filterArray.Length;
 
             //Result matrix's column count
-            var colCount = matrix.Width / filter[0].Length;
+            var colCount = matrix.Width / filterArray[0].Length;
 
             //Rent array as result
             var result = System.Buffers.ArrayPool<int[]>.Shared.Rent(rowCount);
@@ -31,7 +35,7 @@ namespace TrafficSignRecognizer.API.Models.Utils
                     {
                         result[position.Y] = System.Buffers.ArrayPool<int>.Shared.Rent(colCount);
                     }
-                    result[position.Y][position.X] += colEnumerator.Current * filter[position.remainingY][position.remainingX];
+                    result[position.Y][position.X] += colEnumerator.Current * filterArray[position.remainingY][position.remainingX];
                 }
             }
 
@@ -41,10 +45,10 @@ namespace TrafficSignRecognizer.API.Models.Utils
             (int X, int Y, int remainingX, int remainingY) FindPosition(int currentColIndex, int currentRowIndex)
             {
                 return (
-                    (int)Math.Ceiling((double)currentColIndex / filter[0].Length),
-                    (int)Math.Ceiling((double)currentRowIndex / filter.Length),
-                    currentColIndex % filter[0].Length,
-                    currentRowIndex % filter.Length
+                    (int)Math.Ceiling((double)currentColIndex / filterArray[0].Length),
+                    (int)Math.Ceiling((double)currentRowIndex / filterArray.Length),
+                    currentColIndex % filterArray[0].Length,
+                    currentRowIndex % filterArray.Length
                     );
             }
         }
