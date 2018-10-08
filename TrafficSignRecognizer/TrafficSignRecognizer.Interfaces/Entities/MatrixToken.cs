@@ -4,12 +4,11 @@
     {
         public string Value { get; set; }
         public int RowCount { get; set; }
-        public int ColCount { get; set; }
-        public int CurrentRow { get; set; }
 
         public class MatrixRow
         {
             public int[] Value { get; set; }
+            public bool EndRow { get; set; }
         }
     }
 }

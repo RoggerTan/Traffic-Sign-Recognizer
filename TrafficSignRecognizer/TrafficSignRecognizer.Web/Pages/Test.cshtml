@@ -27,13 +27,13 @@
     {
         <table>
             <tbody>
-                @for (var i = 0; i <= matrixToken.CurrentRow; i++)
+                @for (var i = 0; i <= currentRow; i++)
                 {
                     <tr>
-                        @for (var j = 0; j < grayscaledImageMatrix.Width; j++)
+                        @for (var j = 0; j < grayscaledImageMatrix[0].Length; j++)
                         {
                             <td>
-                                @grayscaledImageMatrix.Value[i][j]
+                                @grayscaledImageMatrix[i][j]
                             </td>
                         }
                     </tr>
@@ -51,9 +51,10 @@
 @functions{
     private netstandard2._0.BlazorComponents.LMTInjector<Api> apiInfo;
     private Base64Image grayscaledImage;
-    private ImageMatrix grayscaledImageMatrix;
+    private int[][] grayscaledImageMatrix;
     private MatrixToken matrixToken;
     private netstandard2._0.BlazorComponents.LMTLocal _mainLocal;
+    private int currentRow = -1;
 
     private async void ImageDropHandler(LMTDropEventArgs e)
     {
@@ -63,17 +64,12 @@
 
         matrixToken = await httpClient.PostJsonAsync<MatrixToken>($"{apiInfo.Get().TestUrl}/tomatrix", grayscaledImage);
 
-        grayscaledImageMatrix = new ImageMatrix
-        {
-            Value = new int[matrixToken.RowCount][],
-            Width = matrixToken.ColCount,
-            Height = matrixToken.RowCount
-        };
+        grayscaledImageMatrix = new int[matrixToken.RowCount][];
 
         for (var CurRow = 0; CurRow < matrixToken.RowCount; CurRow++)
         {
-            matrixToken.CurrentRow = CurRow;
-            grayscaledImageMatrix.Value[CurRow] = (await httpClient.PostJsonAsync<MatrixToken.MatrixRow>($"{apiInfo.Get().TestUrl}/getmatrix", matrixToken)).Value;
+            grayscaledImageMatrix[CurRow] = (await httpClient.PostJsonAsync<MatrixToken.MatrixRow>($"{apiInfo.Get().TestUrl}/getmatrix", matrixToken)).Value;
+            currentRow++;
             await Task.Delay(500);
             StateHasChanged();
         }

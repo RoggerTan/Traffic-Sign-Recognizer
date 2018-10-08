@@ -1,23 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using TrafficSignRecognizer.Interfaces.Entities;
 
 namespace TrafficSignRecognizer.API.Models.Storages
 {
     public static class MatrixStorage
     {
-        private static Dictionary<string, ImageMatrix> _storage;
+        private static Dictionary<string, IEnumerable<IEnumerable<int>>> _storage;
 
-        public static string Add(ImageMatrix imageMatrix)
+        public static string Add(IEnumerable<IEnumerable<int>> imageMatrix)
         {
-            if (_storage == null) _storage = new Dictionary<string, ImageMatrix>();
+            if (_storage == null) _storage = new Dictionary<string, IEnumerable<IEnumerable<int>>>();
             var guid = Guid.NewGuid().ToString();
             _storage.Add(guid, imageMatrix);
 
             return guid;
         }
 
-        public static ImageMatrix Get(string guid)
+        public static IEnumerable<IEnumerable<int>> Get(string guid)
         {
             if (_storage == null || !_storage.ContainsKey(guid))
                 return null;

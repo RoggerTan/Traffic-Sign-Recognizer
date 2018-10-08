@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using TrafficSignRecognizer.Interfaces.Entities;
 
 namespace TrafficSignRecognizer.API.Models.Utils
@@ -9,9 +11,9 @@ namespace TrafficSignRecognizer.API.Models.Utils
     public static class BitmapUtils
     {
         //Return matrix of pixel for grayscaled bitmap
-        public static int[][] AsMatrix(this Bitmap bitmap, int dividend = 1)
+        public static IEnumerable<IEnumerable<int>> AsMatrix(this Bitmap bitmap, int dividend = 1)
         {
-            var pixelRows = System.Buffers.ArrayPool<int[]>.Shared.Rent(bitmap.Height);
+            var pixelRows = System.Buffers.ArrayPool<IEnumerable<int>>.Shared.Rent(bitmap.Height);
             int[] pixelCols = null;
 
             for (var i = 0; i < bitmap.Height; i++)
@@ -21,10 +23,10 @@ namespace TrafficSignRecognizer.API.Models.Utils
                 {
                     pixelCols[j] = bitmap.GetPixel(j, i).R / dividend;
                 }
-                pixelRows[i] = pixelCols;
+                pixelRows[i] = pixelCols.Take(bitmap.Width);
             }
 
-            return pixelRows;
+            return pixelRows.Take(bitmap.Height);
         }
 
         public static Bitmap ToGrayScale(this Bitmap bitmap)

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using TrafficSignRecognizer.API.Models.Storages;
 using TrafficSignRecognizer.API.Models.Utils;
 using TrafficSignRecognizer.Interfaces.Entities;
+using static TrafficSignRecognizer.API.Models.Utils.MatrixUtils;
 
 namespace TrafficSignRecognizer.API.Controllers
 {
@@ -18,6 +20,15 @@ namespace TrafficSignRecognizer.API.Controllers
                 .ToBase64Image());
         }
 
+        [HttpPost("withfilter")]
+        public IActionResult WithFilter([FromBody] Base64Image img)
+        {
+            return new JsonResult(img.Base64
+                .ToBitmap()
+                .AsMatrix()
+                .)
+        }
+
         [HttpPost("tomatrix")]
         public IActionResult ToMatrix([FromBody] Base64Image img)
         {
@@ -25,25 +36,23 @@ namespace TrafficSignRecognizer.API.Controllers
                 .ToBitmap();
             return new JsonResult(new MatrixToken
             {
-                Value = MatrixStorage.Add(new ImageMatrix
-                {
-                    Value = bitmap
-                .AsMatrix(),
-                    Width = bitmap.Width,
-                    Height = bitmap.Height
-                }),
-                RowCount = bitmap.Height,
-                ColCount = bitmap.Width,
-                CurrentRow = -1
+                Value = MatrixStorage.Add(bitmap
+                .AsMatrix()),
+                RowCount = bitmap.Height
             });
         }
 
         [HttpPost("getmatrix")]
         public IActionResult GetMatrix([FromBody] MatrixToken token)
         {
+            var emurator = MatrixStorage.Get(token.Value).GetEnumerator();
+            bool endRow = true;
+            if (emurator.MoveNext())
+                endRow = false;
             return new JsonResult(new MatrixToken.MatrixRow
             {
-                Value = MatrixStorage.Get(token.Value).Value[token.CurrentRow]
+                Value = emurator.Current.ToArray(),
+                EndRow = endRow
             });
         }
     }
