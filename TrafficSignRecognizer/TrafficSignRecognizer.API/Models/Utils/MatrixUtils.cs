@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TrafficSignRecognizer.Interfaces.Entities;
 
@@ -15,39 +16,36 @@ namespace TrafficSignRecognizer.API.Models.Utils
             var colCount = matrix.Width / filter[0].Length;
 
             //Rent array as result
-            var result = System.Buffers.ArrayPool<IEnumerable<int>>.Shared.Rent(rowCount);
+            var result = System.Buffers.ArrayPool<int[]>.Shared.Rent(rowCount);
 
-            int[] currentRow = null;
+            var rowEnumerator = matrix.GetEnumerator();
+            IEnumerator<int> colEnumerator = null;
 
-            for (var i = 0; i < matrixHeight; i += filter[0].Length)
+            for (var i = 0; i < matrix.Height && rowEnumerator.MoveNext(); i++)
             {
-                currentRow = System.Buffers.ArrayPool<int>.Shared.Rent(colCount);
-                for (var j = 0; j < matrixWidth; j += filter[0].Length)
+                colEnumerator = rowEnumerator.Current.GetEnumerator();
+                for (var j = 0; j < matrix.Width && colEnumerator.MoveNext(); j++)
                 {
-                    currentRow[j] = MultiplyMatrix(j, i);
+                    var position = FindPosition(j, i);
+                    if (result[position.Y] == null)
+                    {
+                        result[position.Y] = System.Buffers.ArrayPool<int>.Shared.Rent(colCount);
+                    }
+                    result[position.Y][position.X] += colEnumerator.Current * filter[position.remainingY][position.remainingX];
                 }
-                result[i] = currentRow.Take(filter[0].Length);
             }
 
-            return new Matrix<int>(result.Take(matrix.Height), matrix.Width, matrix.Height);
+            return new Matrix<int>(result.Take(rowCount), colCount, rowCount);
 
-            //Local functions
-            int MultiplyMatrix(int positionX, int positionY)
+            //Local Function
+            (int X, int Y, int remainingX, int remainingY) FindPosition(int currentColIndex, int currentRowIndex)
             {
-                int multiplyResult = 1;
-
-                int loopLimitX = filter[0].Length + positionX;
-                int loopLimitY = filter[0].Length + positionY;
-
-                for (var i = positionY; i < loopLimitY; i++)
-                {
-                    for (var j = positionX; j < loopLimitX; j++)
-                    {
-                        multiplyResult += matrix[i][j] * filter[i - positionY][j - positionX];
-                    }
-                }
-
-                return multiplyResult;
+                return (
+                    (int)Math.Ceiling((double)currentColIndex / filter[0].Length),
+                    (int)Math.Ceiling((double)currentRowIndex / filter.Length),
+                    currentColIndex % filter[0].Length,
+                    currentRowIndex % filter.Length
+                    );
             }
         }
     }

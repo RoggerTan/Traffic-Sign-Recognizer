@@ -22,6 +22,7 @@
     </LMTInjector>
 
     <img src="@($"data:image/png;base64,{grayscaledImage?.Base64}")" />
+    <img src="@($"data:image/png;base64,{filteredImage?.Base64}")" />
 
     @if (grayscaledImageMatrix != null)
     {
@@ -55,12 +56,15 @@
     private MatrixToken matrixToken;
     private netstandard2._0.BlazorComponents.LMTLocal _mainLocal;
     private int currentRow = -1;
+    private Base64Image filteredImage;
 
     private async void ImageDropHandler(LMTDropEventArgs e)
     {
         var base64Image = new Base64Image { Base64 = e.Base64String };
 
         grayscaledImage = await httpClient.PostJsonAsync<Base64Image>($"{apiInfo.Get().TestUrl}/tograyscale", base64Image);
+
+        filteredImage = await httpClient.PostJsonAsync<Base64Image>($"{apiInfo.Get().TestUrl}/withfilter", base64Image);
 
         matrixToken = await httpClient.PostJsonAsync<MatrixToken>($"{apiInfo.Get().TestUrl}/tomatrix", grayscaledImage);
 

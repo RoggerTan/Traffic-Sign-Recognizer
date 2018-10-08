@@ -8,6 +8,7 @@ namespace TrafficSignRecognizer.Interfaces.Entities
         public IEnumerable<IEnumerable<T>> Value { get; set; }
         public int Width;
         public int Height;
+        public T CurrentCellValue => Value.GetEnumerator().Current.GetEnumerator().Current;
 
         public Matrix(IEnumerable<IEnumerable<T>> value, int width, int height)
         {
@@ -23,7 +24,7 @@ namespace TrafficSignRecognizer.Interfaces.Entities
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return Value.GetEnumerator().Current.GetEnumerator();
+            return Value.GetEnumerator();
         }
     }
 }

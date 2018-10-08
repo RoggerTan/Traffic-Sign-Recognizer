@@ -11,7 +11,7 @@ namespace TrafficSignRecognizer.API.Models.Utils
     public static class BitmapUtils
     {
         //Return matrix of pixel for grayscaled bitmap
-        public static IEnumerable<IEnumerable<int>> AsMatrix(this Bitmap bitmap, int dividend = 1)
+        public static Matrix<int> AsMatrix(this Bitmap bitmap, int dividend = 1)
         {
             var pixelRows = System.Buffers.ArrayPool<IEnumerable<int>>.Shared.Rent(bitmap.Height);
             int[] pixelCols = null;
@@ -26,7 +26,7 @@ namespace TrafficSignRecognizer.API.Models.Utils
                 pixelRows[i] = pixelCols.Take(bitmap.Width);
             }
 
-            return pixelRows.Take(bitmap.Height);
+            return new Matrix<int>(pixelRows.Take(bitmap.Height), bitmap.Width, bitmap.Height);
         }
 
         public static Bitmap ToGrayScale(this Bitmap bitmap)
@@ -55,6 +55,30 @@ namespace TrafficSignRecognizer.API.Models.Utils
                 for (var j = 0; j < matrix[0].Length; j++)
                 {
                     image.SetPixel(i, j, Color.FromArgb(matrix[i][j], matrix[i][j], matrix[i][j]));
+                }
+            }
+
+            return image;
+        }
+
+        public static Bitmap ToBitmap(this Matrix<int> matrix)
+        {
+            var image = new Bitmap(matrix.Width, matrix.Height);
+
+            var rowEnumerator = matrix.GetEnumerator();
+            IEnumerator<int> colEnumerator = null;
+
+            for (var i = 0; i < matrix.Height && rowEnumerator.MoveNext(); i++)
+            {
+                colEnumerator = rowEnumerator.Current.GetEnumerator();
+                for (var j = 0; j < matrix.Width && colEnumerator.MoveNext(); j++)
+                {
+                    var color = colEnumerator.Current > 255 ?
+                        255 :
+                        colEnumerator.Current < 0 ?
+                        0 :
+                        colEnumerator.Current;
+                    image.SetPixel(j, i, Color.FromArgb(color, color, color));
                 }
             }
 
