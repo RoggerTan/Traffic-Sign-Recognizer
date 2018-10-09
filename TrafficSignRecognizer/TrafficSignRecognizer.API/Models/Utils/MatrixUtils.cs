@@ -45,8 +45,8 @@ namespace TrafficSignRecognizer.API.Models.Utils
             (int X, int Y, int remainingX, int remainingY) FindPosition(int currentColIndex, int currentRowIndex)
             {
                 return (
-                    (int)Math.Ceiling((double)currentColIndex / filterArray[0].Length),
-                    (int)Math.Ceiling((double)currentRowIndex / filterArray.Length),
+                    (int)Math.Round((double)currentColIndex / filterArray[0].Length, MidpointRounding.AwayFromZero),
+                    (int)Math.Round((double)currentRowIndex / filterArray.Length, MidpointRounding.AwayFromZero),
                     currentColIndex % filterArray[0].Length,
                     currentRowIndex % filterArray.Length
                     );

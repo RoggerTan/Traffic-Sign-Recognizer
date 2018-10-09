@@ -21,7 +21,10 @@
         </LMTTry>
     </LMTInjector>
 
+    <h1>1. Grayscaled</h1>
     <img src="@($"data:image/png;base64,{grayscaledImage?.Base64}")" />
+
+    <h1>2. Filtered</h1>
     <img src="@($"data:image/png;base64,{filteredImage?.Base64}")" />
 
     @if (grayscaledImageMatrix != null)
@@ -73,17 +76,21 @@
         };
         filteredImage = await httpClient.PostJsonAsync<Base64Image>($"{apiInfo.Get().TestUrl}/withfilter", new { img = base64Image, filter });
 
-        matrixToken = await httpClient.PostJsonAsync<MatrixToken>($"{apiInfo.Get().TestUrl}/tomatrix", grayscaledImage);
+        StateHasChanged();
 
-        grayscaledImageMatrix = new int[matrixToken.RowCount][];
+        #region get grayscaled image matrix
+        //matrixToken = await httpClient.PostJsonAsync<MatrixToken>($"{apiInfo.Get().TestUrl}/tomatrix", grayscaledImage);
 
-        for (var CurRow = 0; CurRow < matrixToken.RowCount; CurRow++)
-        {
-            grayscaledImageMatrix[CurRow] = (await httpClient.PostJsonAsync<MatrixToken.MatrixRow>($"{apiInfo.Get().TestUrl}/getmatrix", matrixToken)).Value;
-            currentRow++;
-            await Task.Delay(500);
-            StateHasChanged();
-        }
+        //grayscaledImageMatrix = new int[matrixToken.RowCount][];
+
+        //for (var CurRow = 0; CurRow < matrixToken.RowCount; CurRow++)
+        //{
+        //    grayscaledImageMatrix[CurRow] = (await httpClient.PostJsonAsync<MatrixToken.MatrixRow>($"{apiInfo.Get().TestUrl}/getmatrix", matrixToken)).Value;
+        //    currentRow++;
+        //    await Task.Delay(500);
+        //    StateHasChanged();
+        //}
+        #endregion
 
         Dev.Warn("Done!");
     }
