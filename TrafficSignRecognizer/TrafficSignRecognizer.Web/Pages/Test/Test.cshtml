@@ -1,0 +1,51 @@
+﻿@page "/test"
+@inherits TestLogic
+@using Entities.InjectTypes
+
+<LMTLocal ref="_mainLocal">
+    <style>
+        .dropArea, #@_mainLocal.id img {
+            display: block;
+            width: 300px;
+            height: 300px;
+            border: 2px solid black;
+        }
+
+        table * {
+            border: 2px solid black;
+        }
+    </style>
+    <LMTInjector jsonpath="/json/api.json" ref="@apiInfo" type="Api">
+        <LMTTry>
+            <LMTDropArea class="dropArea" ondrop="@ImageDropHandler">
+
+            </LMTDropArea>
+        </LMTTry>
+    </LMTInjector>
+
+    <h1>1. Grayscaled</h1>
+    <img src="@($"data:image/png;base64,{grayscaledImage?.Base64}")" />
+
+    <h1>2. Filtered</h1>
+    <img src="@($"data:image/png;base64,{filteredImage?.Base64}")" />
+
+    @if (grayscaledImageMatrix != null)
+    {
+        <table>
+            <tbody>
+                @for (var i = 0; i <= currentRow; i++)
+                {
+                    <tr>
+                        @for (var j = 0; j < grayscaledImageMatrix[0].Length; j++)
+                        {
+                            <td>
+                                @grayscaledImageMatrix[i][j]
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+</LMTLocal>
