@@ -9,12 +9,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Accord.Controls" Version="3.8.0" />
-    <PackageReference Include="Accord.Imaging" Version="3.8.0" />
-    <PackageReference Include="Accord.MachineLearning" Version="3.8.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.5" />
     <PackageReference Include="System.Drawing.Common" Version="4.5.1" />
+    <PackageReference Include="TensorFlowSharp" Version="1.11.0" />
   </ItemGroup>
 
   <ItemGroup>

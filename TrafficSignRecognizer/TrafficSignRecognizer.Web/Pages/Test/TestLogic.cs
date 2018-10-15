@@ -36,7 +36,7 @@ namespace TrafficSignRecognizer.Web.Pages.Test
         };
             filteredImage = await httpClient.PostJsonAsync<Base64Image>($"{apiInfo.Get().TestUrl}/withfilter", new { img = base64Image, filter });
 
-            base.StateHasChanged();
+            StateHasChanged();
 
             #region get grayscaled image matrix
             //matrixToken = await httpClient.PostJsonAsync<MatrixToken>($"{apiInfo.Get().TestUrl}/tomatrix", grayscaledImage);
