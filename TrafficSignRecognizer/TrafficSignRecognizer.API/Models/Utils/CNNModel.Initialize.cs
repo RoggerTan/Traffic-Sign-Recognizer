@@ -6,22 +6,27 @@ namespace TrafficSignRecognizer.API.Models.Utils
 {
     public partial class CNNModel
     {
+        /// <summary>
+        /// Initialize CNN model.
+        /// </summary>
         private void Initialize()
         {
-            // specifies a 2-layer neural network with one hidden layer of 20 neurons
+            // Specifies a 2-layer neural network with one hidden layer of 20 neurons
             _Net = new Net<double>();
 
-            _Net.AddLayer(new InputLayer(28, 28, 1));
-            _Net.AddLayer(new ConvLayer(5, 5, 8) { Stride = 1, Pad = 2 });
+            // Depth corresponds to the different color channels of an image. Check out https://stackoverflow.com/questions/32294261/what-is-depth-of-a-convolutional-neural-network
+            _Net.AddLayer(new InputLayer(_ImgWidth, _ImgHeight, 3));
+            // the stride is the step length that we slide the filter. When the stride is 1 then we move the filters one pixel at a time. When the stride is 2 (or uncommonly 3 or more, though this is rare in practice) then the filters jump 2 pixels at a time as we slide them around. This will produce smaller output volumes spatially. See more here: http://cs231n.github.io/convolutional-networks/
+            _Net.AddLayer(new ConvLayer(3, 3, 8) { Stride = 1, Pad = 0 });
             _Net.AddLayer(new ReluLayer());
-            _Net.AddLayer(new PoolLayer(2, 2) { Stride = 2 });
-            _Net.AddLayer(new ConvLayer(5, 5, 16) { Stride = 1, Pad = 2 });
+            _Net.AddLayer(new PoolLayer(2, 2) { Stride = 1 });
+            _Net.AddLayer(new ConvLayer(3, 3, 16) { Stride = 1, Pad = 0 });
             _Net.AddLayer(new ReluLayer());
-            _Net.AddLayer(new PoolLayer(3, 3) { Stride = 3 });
-            _Net.AddLayer(new FullyConnLayer(10));
+            _Net.AddLayer(new PoolLayer(2, 2) { Stride = 1 });
+            _Net.AddLayer(new FullyConnLayer(256));
             _Net.AddLayer(new SoftmaxLayer(10));
 
-            _Trainer = new SgdTrainer(this._Net)
+            _Trainer = new SgdTrainer(_Net)
             {
                 LearningRate = 0.01,
                 BatchSize = 20,
