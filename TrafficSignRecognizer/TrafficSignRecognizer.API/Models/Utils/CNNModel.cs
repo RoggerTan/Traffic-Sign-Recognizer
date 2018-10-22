@@ -32,9 +32,9 @@ namespace TrafficSignRecognizer.API.Models.Utils
             return _Model;
         }
 
-        public void Train()
-        {
-            //var folders = Directory.
-        }
+        //public string Predict(double[] x)
+        //{
+
+        //}
     }
 }

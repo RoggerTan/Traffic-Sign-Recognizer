@@ -26,6 +26,7 @@ namespace TrafficSignRecognizer.API.Models.Utils
             _Net.AddLayer(new FullyConnLayer(256));
             _Net.AddLayer(new SoftmaxLayer(10));
 
+            //Batch size is the sample quantity that will be learnt at once.
             _Trainer = new SgdTrainer(_Net)
             {
                 LearningRate = 0.01,
