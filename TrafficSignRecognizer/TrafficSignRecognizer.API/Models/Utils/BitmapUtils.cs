@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Hosting;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using TrafficSignRecognizer.Interfaces.Entities;
 
 namespace TrafficSignRecognizer.API.Models.Utils
@@ -96,6 +98,12 @@ namespace TrafficSignRecognizer.API.Models.Utils
                     Base64 = Convert.ToBase64String(stream.ToArray())
                 };
             }
+        }
+
+        public static async Task<byte[]> GetBitmapFromUrl(string relativePath, IHostingEnvironment env)
+        {
+            var absolutePath = $"{env.WebRootPath}{relativePath}";
+            return await File.ReadAllBytesAsync(relativePath);
         }
     }
 }
