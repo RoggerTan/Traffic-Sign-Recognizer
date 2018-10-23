@@ -26,7 +26,7 @@ namespace TrafficSignRecognizer.API.Models.ANNModel
             const int w = 28;
             const int h = 28;
             // Number of classes in the output layer.
-            const int numClasses = 10;
+            const int numClasses = 62;
 
             var dataShape = new Shape(w, h, 1, batchSize);
             var labelShape = new Shape(1, 1, numClasses, batchSize);

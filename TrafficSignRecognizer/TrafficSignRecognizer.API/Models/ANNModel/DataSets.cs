@@ -8,13 +8,6 @@ namespace TrafficSignRecognizer.API.Models.ANNModel
 {
     public class DataSets
     {
-        private const string urlMnist = @"http://yann.lecun.com/exdb/mnist/";
-        private const string mnistFolder = @"..\Mnist\";
-        private const string trainingLabelFile = "train-labels-idx1-ubyte.gz";
-        private const string trainingImageFile = "train-images-idx3-ubyte.gz";
-        private const string testingLabelFile = "t10k-labels-idx1-ubyte.gz";
-        private const string testingImageFile = "t10k-images-idx3-ubyte.gz";
-
         public DataSet Train { get; set; }
 
         public DataSet Validation { get; set; }

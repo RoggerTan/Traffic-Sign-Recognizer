@@ -30,7 +30,7 @@ namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
             _Trainer = new SgdTrainer(_Net)
             {
                 LearningRate = 0.01,
-                BatchSize = 20,
+                BatchSize = _BatchSize,
                 L2Decay = 0.001,
                 Momentum = 0.9
             };
