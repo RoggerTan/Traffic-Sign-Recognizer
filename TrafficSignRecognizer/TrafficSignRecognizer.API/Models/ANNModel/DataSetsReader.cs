@@ -13,7 +13,7 @@ namespace TrafficSignRecognizer.API.Models.ANNModel
 
             foreach(var directory in directories)
             {
-                var label = int.Parse(Path.GetDirectoryName(directory));
+                var label = int.Parse(directory.Substring(directory.LastIndexOf('\\') + 1));
 
                 foreach (var file in Directory.EnumerateFiles(directory, "*.png"))
                 {

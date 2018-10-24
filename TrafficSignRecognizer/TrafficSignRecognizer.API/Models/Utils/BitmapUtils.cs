@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using ConvNetSharp.Volume;
+using ConvNetSharp.Volume.Double;
+using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using TrafficSignRecognizer.Interfaces.Entities;
 
@@ -12,6 +15,13 @@ namespace TrafficSignRecognizer.API.Models.Utils
 {
     public static class BitmapUtils
     {
+        private static readonly BinaryFormatter _Bf;
+
+        static BitmapUtils()
+        {
+            _Bf = new BinaryFormatter();
+        }
+
         //Return matrix of pixel for grayscaled bitmap
         public static Matrix<int> AsMatrix(this Bitmap bitmap, int dividend = 1)
         {
@@ -100,10 +110,50 @@ namespace TrafficSignRecognizer.API.Models.Utils
             }
         }
 
-        public static async Task<byte[]> GetBitmapFromUrl(string relativePath, IHostingEnvironment env)
+        public static byte[] GetColorBytesFromBitmapUrl(string relativePath, IHostingEnvironment env, int width = -1, int height = -1)
         {
             var absolutePath = $"{env.WebRootPath}{relativePath}";
-            return await File.ReadAllBytesAsync(relativePath);
+
+            var img = Image.FromFile(absolutePath) as Bitmap;
+
+            return GetColorBytesFromBitmap(img, env, width, height);
+        }
+
+        public static byte[] GetColorBytesFromBitmap(this Bitmap img, IHostingEnvironment env, int width = -1, int height = -1)
+        {
+            var grayscaledImg = img.ToGrayScale();
+
+            if (width != -1)
+            {
+                grayscaledImg = new Bitmap(grayscaledImg, width, height);
+            }
+
+            var result = System.Buffers.ArrayPool<byte>.Shared.Rent(grayscaledImg.Width * grayscaledImg.Height);
+
+            for (var i = 0; i < grayscaledImg.Height; i++)
+            {
+                for (var j = 0; j < grayscaledImg.Width; j++)
+                {
+                    result[j + i * grayscaledImg.Width] = grayscaledImg.GetPixel(j, i).R;
+                }
+            }
+
+            return result;
+        }
+
+        public static void AddImgToVolume(string imgUrl, int width, int height, int currentBatch, Volume<double> dataVolume, IHostingEnvironment env)
+        {
+            var j = 0;
+
+            var img = GetColorBytesFromBitmapUrl(imgUrl, env, width, height);
+
+            for (var y = 0; y < height; y++)
+            {
+                for (var x = 0; x < width; x++)
+                {
+                    dataVolume.Set(x, y, 0, currentBatch, img[j++] / 255.0);
+                }
+            }
         }
     }
 }

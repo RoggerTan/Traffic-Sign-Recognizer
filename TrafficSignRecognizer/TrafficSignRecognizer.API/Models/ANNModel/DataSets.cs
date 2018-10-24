@@ -14,20 +14,18 @@ namespace TrafficSignRecognizer.API.Models.ANNModel
 
         public DataSet Test { get; set; }
 
-        public bool Load(IHostingEnvironment env, int validationSize = 1000)
+        public void Load(string trainingPath, string testingPath, IHostingEnvironment env, int width, int height, int validationSize = 1000)
         {
             // Load datasets
-            var train_images = DataSetsReader.Read("/DataSets/Training", env).ToList();
-            var testing_images = DataSetsReader.Read("/DataSets/Testing", env).ToList();
+            var train_images = DataSetsReader.Read(trainingPath, env).ToList();
+            var testing_images = DataSetsReader.Read(testingPath, env).ToList();
 
             var valiation_images = train_images.GetRange(train_images.Count - validationSize, validationSize);
             train_images = train_images.GetRange(0, train_images.Count - validationSize);
 
-            Train = new DataSet(train_images);
-            Validation = new DataSet(valiation_images);
-            Test = new DataSet(testing_images);
-
-            return true;
+            Train = new DataSet(train_images, width, height);
+            Validation = new DataSet(valiation_images, width, height);
+            Test = new DataSet(testing_images, width, height);
         }
     }
 }

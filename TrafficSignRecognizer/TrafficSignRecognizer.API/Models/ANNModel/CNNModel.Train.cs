@@ -7,10 +7,19 @@ namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
     {
         public async Task BeginTraining(int totalBatchSize)
         {
+            IsTrained = true;
+
+            if (_DataSets == null)
+            {
+                _DataSets = new DataSets();
+                _DataSets.Load(_TrainingPath, _TestingPath, _Env, _ImgWidth, _ImgHeight);
+            }
+
             var loopCount = 0;
+
             do
             {
-                var trainSample = await _DataSet.Train.NextBatch(_BatchSize, _Env);
+                var trainSample = await _DataSets.Train.NextBatch(_BatchSize, _Env);
                 Train(trainSample.Item1, trainSample.Item2);
             } while (loopCount < totalBatchSize/_BatchSize);
         }

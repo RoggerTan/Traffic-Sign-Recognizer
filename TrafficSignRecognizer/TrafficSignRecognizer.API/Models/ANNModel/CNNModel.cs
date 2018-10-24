@@ -2,13 +2,14 @@
 using ConvNetSharp.Core.Training.Double;
 using Microsoft.AspNetCore.Hosting;
 using System.Drawing;
+using TrafficSignRecognizer.API.Models.Utils;
 using TrafficSignRecognizer.Interfaces.Entities;
 
 namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
 {
     public partial class CNNModel
     {
-        private CNNModel _Model;
+        private static CNNModel _Model;
         private Net<double> _Net;
         private SgdTrainer _Trainer;
         private const int _ImgWidth = 100;
@@ -16,8 +17,9 @@ namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
         private readonly string _TrainingPath;
         private readonly string _TestingPath;
         private const int _BatchSize = 20;
-        private DataSets _DataSet;
+        private DataSets _DataSets;
         private IHostingEnvironment _Env;
+        public bool IsTrained { get; set; }
 
         private CNNModel(string trainingPath, string testingPath, IHostingEnvironment env)
         {
@@ -28,7 +30,7 @@ namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
             Initialize();
         }
 
-        public CNNModel GetInstance(string trainingPath, string testingPath, IHostingEnvironment env = null)
+        public static CNNModel GetInstance(string trainingPath, string testingPath, IHostingEnvironment env = null)
         {
             if (_Model == null) _Model = new CNNModel(trainingPath, testingPath, env);
             return _Model;
@@ -36,6 +38,8 @@ namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
 
         public TrafficSignInfo Predict(Bitmap x)
         {
+            //_Net.Forward(x.);
+
             return new TrafficSignInfo
             {
                 Label = _Net.GetPrediction()[0]

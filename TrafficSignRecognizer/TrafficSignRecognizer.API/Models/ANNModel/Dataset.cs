@@ -15,20 +15,22 @@ namespace TrafficSignRecognizer.API.Models.ANNModel
         private readonly Random _random = new Random(RandomUtilities.Seed);
         private int _start;
         private int _epochCompleted;
+        private int _Width;
+        private int _Height;
 
-        public DataSet(List<TrafficSignInfo> trainImages)
+        public DataSet(List<TrafficSignInfo> trainImages, int width, int height)
         {
             _trainImages = trainImages;
+            _Width = width;
+            _Height = height;
         }
 
         public async Task<Tuple<Volume<double>, Volume<double>, int[]>> NextBatch(int batchSize, IHostingEnvironment env)
         {
-            const int w = 28;
-            const int h = 28;
             // Number of classes in the output layer.
             const int numClasses = 62;
 
-            var dataShape = new Shape(w, h, 1, batchSize);
+            var dataShape = new Shape(_Width, _Height, 1, batchSize);
             var labelShape = new Shape(1, 1, numClasses, batchSize);
             var data = new double[dataShape.TotalLength];
             var label = new double[labelShape.TotalLength];
@@ -54,14 +56,7 @@ namespace TrafficSignRecognizer.API.Models.ANNModel
 
                 labels[i] = entry.Label;
 
-                var j = 0;
-                for (var y = 0; y < h; y++)
-                {
-                    for (var x = 0; x < w; x++)
-                    {
-                        dataVolume.Set(x, y, 0, i, (await BitmapUtils.GetBitmapFromUrl(entry.ImgUrl, env))[j++] / 255.0);
-                    }
-                }
+                BitmapUtils.AddImgToVolume(entry.ImgUrl, _Width, _Height, i, dataVolume, env);
 
                 label[i * numClasses + entry.Label] = 1.0;
 
