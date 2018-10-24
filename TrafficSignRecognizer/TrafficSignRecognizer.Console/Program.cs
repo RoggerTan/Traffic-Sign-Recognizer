@@ -14,7 +14,7 @@ namespace TrafficSignRecognizer.Console
 
             if (!model.IsTrained)
             {
-                await model.BeginTraining(1000);
+                await model.BeginTraining(60);
             }
 
             var result = model.Predict(new Bitmap($"{Environment.CurrentDirectory}\00017_00000.png"));

@@ -20,7 +20,7 @@ namespace TrafficSignRecognizer.API.Models.ANNModel
                     var sign = new TrafficSignInfo
                     {
                         Label = label,
-                        ImgUrl = $"{relativePath}/{Path.GetFileName(file)}"
+                        ImgUrl = $"{relativePath}/{directory.Substring(directory.LastIndexOf('\\'))}/{Path.GetFileName(file)}"
                     };
 
                     yield return sign;

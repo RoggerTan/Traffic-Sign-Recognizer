@@ -12,8 +12,8 @@ namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
         private static CNNModel _Model;
         private Net<double> _Net;
         private SgdTrainer _Trainer;
-        private const int _ImgWidth = 100;
-        private const int _ImgHeight = 100;
+        private const int _ImgWidth = 32;
+        private const int _ImgHeight = 32;
         private readonly string _TrainingPath;
         private readonly string _TestingPath;
         private const int _BatchSize = 20;

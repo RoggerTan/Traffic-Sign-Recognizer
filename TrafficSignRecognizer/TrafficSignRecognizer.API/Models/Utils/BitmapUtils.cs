@@ -112,7 +112,7 @@ namespace TrafficSignRecognizer.API.Models.Utils
 
         public static byte[] GetColorBytesFromBitmapUrl(string relativePath, IHostingEnvironment env, int width = -1, int height = -1)
         {
-            var absolutePath = $"{env.WebRootPath}{relativePath}";
+            var absolutePath = $"{env.WebRootPath}{relativePath.Replace('/', '\\')}";
 
             var img = Image.FromFile(absolutePath) as Bitmap;
 
