@@ -37,7 +37,7 @@ namespace TrafficSignRecognizer.API.Controllers
 
             if (!model.IsTrained)
             {
-                await model.BeginTraining(1000);
+                model.BeginTraining(1000);
             }
 
             var result = model.Predict(imgStream);

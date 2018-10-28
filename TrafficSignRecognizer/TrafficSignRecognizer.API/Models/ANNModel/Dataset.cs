@@ -25,7 +25,7 @@ namespace TrafficSignRecognizer.API.Models.ANNModel
             _Height = height;
         }
 
-        public async Task<Tuple<Volume<double>, Volume<double>, int[]>> NextBatch(int batchSize, IHostingEnvironment env)
+        public Tuple<Volume<double>, Volume<double>, int[]> NextBatch(int batchSize, IHostingEnvironment env)
         {
             // Number of classes in the output layer.
             const int numClasses = 62;
