@@ -65,7 +65,15 @@ namespace ConvNetSharp.Volume
 
         public override T Get(int w, int h, int c, int n)
         {
-            return this._storage[w + h * this._dim0 + c * this._dim0Dm1 + n * this._dim0Dm1Dm2];
+            try
+            {
+                return this._storage[w + h * this._dim0 + c * this._dim0Dm1 + n * this._dim0Dm1Dm2];
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         public override T Get(int w, int h, int c)
