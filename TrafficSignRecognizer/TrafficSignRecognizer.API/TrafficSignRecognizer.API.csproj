@@ -14,13 +14,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Cognitio.ConvNetSharp.Core" Version="0.4.11-alpha" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.5" />
     <PackageReference Include="System.Drawing.Common" Version="4.5.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ConvNetSharp.Core\ConvNetSharp.Core.csproj" />
+    <ProjectReference Include="..\ConvNetSharp.Volume\ConvNetSharp.Volume.csproj" />
     <ProjectReference Include="..\TrafficSignRecognizer.Interfaces\TrafficSignRecognizer.Interfaces.csproj" />
   </ItemGroup>
 
