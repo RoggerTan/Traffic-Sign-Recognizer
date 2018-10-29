@@ -17,7 +17,7 @@ namespace TrafficSignRecognizer.Console
                 model.BeginTraining(60);
             }
 
-            var result = model.Predict(new Bitmap($"{Environment.CurrentDirectory}\00017_00000.png"));
+            var result = model.Predict(new Bitmap($"{Environment.CurrentDirectory}\\00017_00000.png"));
         }
     }
 }

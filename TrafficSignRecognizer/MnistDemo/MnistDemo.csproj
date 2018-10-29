@@ -34,12 +34,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ConvNetSharp.Core, Version=0.4.11.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cognitio.ConvNetSharp.Core.0.4.11-alpha\lib\net46\ConvNetSharp.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="ConvNetSharp.Volume, Version=0.4.11.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cognitio.ConvNetSharp.Volume.0.4.11-alpha\lib\net46\ConvNetSharp.Volume.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -64,6 +58,16 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ConvNetSharp.Core\ConvNetSharp.Core.csproj">
+      <Project>{389a8c49-bdf9-4c8f-9022-de3e1e093bd3}</Project>
+      <Name>ConvNetSharp.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ConvNetSharp.Volume\ConvNetSharp.Volume.csproj">
+      <Project>{5193079e-d240-4f9b-a46c-339e0604485c}</Project>
+      <Name>ConvNetSharp.Volume</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

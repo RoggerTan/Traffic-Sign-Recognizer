@@ -7,13 +7,7 @@ namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
     {
         public void BeginTraining(int totalBatchSize)
         {
-            IsTrained = true;
 
-            if (_DataSets == null)
-            {
-                _DataSets = new DataSets();
-                _DataSets.Load(_TrainingPath, _TestingPath, _Env, _ImgWidth, _ImgHeight);
-            }
 
             var loopCount = 0;
 

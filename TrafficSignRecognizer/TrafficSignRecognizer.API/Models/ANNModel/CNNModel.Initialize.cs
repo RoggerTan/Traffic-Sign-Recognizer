@@ -11,6 +11,14 @@ namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
         /// </summary>
         private void Initialize()
         {
+            IsTrained = true;
+
+            if (_DataSets == null)
+            {
+                _DataSets = new DataSets();
+                _DataSets.Load(_TrainingPath, _TestingPath, _Env, _ImgWidth, _ImgHeight);
+            }
+
             // Specifies a 2-layer neural network with one hidden layer of 20 neurons
             _Net = new Net<double>();
 
