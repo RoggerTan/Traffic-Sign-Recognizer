@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using ConvNetSharp.Volume;
 using ConvNetSharp.Volume.Double;
 using Microsoft.AspNetCore.Hosting;
-using TrafficSignRecognizer.API.Models.Utils;
+using TrafficSignRecognizer.Utils;
 using TrafficSignRecognizer.Interfaces.Entities;
 
 namespace TrafficSignRecognizer.API.Models.ANNModel

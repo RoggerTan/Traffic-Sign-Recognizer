@@ -23,6 +23,7 @@
     <ProjectReference Include="..\ConvNetSharp.Core\ConvNetSharp.Core.csproj" />
     <ProjectReference Include="..\ConvNetSharp.Volume\ConvNetSharp.Volume.csproj" />
     <ProjectReference Include="..\TrafficSignRecognizer.Interfaces\TrafficSignRecognizer.Interfaces.csproj" />
+    <ProjectReference Include="..\TrafficSignRecognizer.Utils\TrafficSignRecognizer.Utils.csproj" />
   </ItemGroup>
 
 </Project>

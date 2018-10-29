@@ -11,7 +11,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using TrafficSignRecognizer.Interfaces.Entities;
 
-namespace TrafficSignRecognizer.API.Models.Utils
+namespace TrafficSignRecognizer.Utils
 {
     public static class BitmapUtils
     {

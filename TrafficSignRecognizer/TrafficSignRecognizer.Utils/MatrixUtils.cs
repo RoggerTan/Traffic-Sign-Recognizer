@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TrafficSignRecognizer.Interfaces.Entities;
 
-namespace TrafficSignRecognizer.API.Models.Utils
+namespace TrafficSignRecognizer.Utils
 {
     public static class MatrixUtils
     {

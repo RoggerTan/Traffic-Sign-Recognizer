@@ -2,7 +2,7 @@
 using ConvNetSharp.Core.Training.Double;
 using Microsoft.AspNetCore.Hosting;
 using System.Drawing;
-using TrafficSignRecognizer.API.Models.Utils;
+using TrafficSignRecognizer.Utils;
 using TrafficSignRecognizer.Interfaces.Entities;
 
 namespace TrafficSignRecognizer.API.Models.ANNModel.Utils

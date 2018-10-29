@@ -29,8 +29,8 @@ namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
             _Net.AddLayer(new ConvLayer(3, 3, 16) { Stride = 1, Pad = 0 });
             _Net.AddLayer(new ReluLayer());
             _Net.AddLayer(new PoolLayer(2, 2) { Stride = 1 });
-            _Net.AddLayer(new FullyConnLayer(256));
-            _Net.AddLayer(new SoftmaxLayer(256));
+            _Net.AddLayer(new FullyConnLayer(62));
+            _Net.AddLayer(new SoftmaxLayer(62));
 
             //Batch size is the sample quantity that will be learnt at once.
             _Trainer = new SgdTrainer(_Net)

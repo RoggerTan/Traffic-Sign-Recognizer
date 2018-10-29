@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using TrafficSignRecognizer.API.Models.Storages;
-using TrafficSignRecognizer.API.Models.Utils;
+using TrafficSignRecognizer.Utils;
 using TrafficSignRecognizer.Interfaces.Entities;
-using static TrafficSignRecognizer.API.Models.Utils.MatrixUtils;
+using static TrafficSignRecognizer.Utils.MatrixUtils;
 
 namespace TrafficSignRecognizer.API.Controllers
 {
