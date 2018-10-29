@@ -10,7 +10,9 @@ namespace MnistDemo
     {
         public static List<MnistEntry> Load(string labelFile, string imageFile, int maxItem = -1)
         {
+            //Int array
             var label = LoadLabels(labelFile, maxItem);
+            //Byte array
             var images = LoadImages(imageFile, maxItem);
 
             if (label.Count == 0 || images.Count == 0)
