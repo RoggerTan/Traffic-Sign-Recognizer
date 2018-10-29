@@ -11,8 +11,6 @@ namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
         /// </summary>
         private void Initialize()
         {
-            IsTrained = true;
-
             if (_DataSets == null)
             {
                 _DataSets = new DataSets();

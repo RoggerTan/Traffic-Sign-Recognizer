@@ -7,7 +7,7 @@ namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
     {
         public void BeginTraining(int totalBatchSize)
         {
-
+            IsTrained = true;
 
             var loopCount = 0;
 

@@ -28,7 +28,7 @@ namespace TrafficSignRecognizer.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Predict([FromBody] Base64Image img, IHostingEnvironment env)
+        public IActionResult Predict([FromBody] Base64Image img, IHostingEnvironment env)
         {
             if (img == null) return NoContent();
             var imgStream = new Bitmap(new MemoryStream(Convert.FromBase64String(img.Base64)));
