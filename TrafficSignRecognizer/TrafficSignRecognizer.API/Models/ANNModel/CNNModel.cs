@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Hosting;
 using System.Drawing;
 using TrafficSignRecognizer.Utils;
 using TrafficSignRecognizer.Interfaces.Entities;
+using ConvNetSharp.Volume.Double;
+using ConvNetSharp.Volume;
+using System.Linq;
 
 namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
 {
@@ -36,9 +39,11 @@ namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
             return _Model;
         }
 
-        public TrafficSignInfo Predict(Bitmap x)
+        public TrafficSignInfo Predict(Bitmap img)
         {
-            //_Net.Forward(x.);
+            var volume = BuilderInstance.Volume.From(img.GetColorBytesFromBitmap(_Env, _ImgWidth, _ImgHeight).Select(x => (double)x).ToArray(), new Shape(_ImgWidth, _ImgHeight));
+
+            _Net.Forward(volume);
 
             return new TrafficSignInfo
             {

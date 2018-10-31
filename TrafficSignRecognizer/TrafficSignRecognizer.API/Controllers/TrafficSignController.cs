@@ -13,6 +13,13 @@ namespace TrafficSignRecognizer.API.Controllers
     [ApiController]
     public class TrafficSignController : ControllerBase
     {
+        private IHostingEnvironment _Env;
+
+        public TrafficSignController(IHostingEnvironment Env)
+        {
+            _Env = Env;
+        }
+
         [HttpPost("get")]
         public IActionResult Get([FromBody]Base64Image img)
         {
@@ -27,17 +34,17 @@ namespace TrafficSignRecognizer.API.Controllers
             });
         }
 
-        [HttpGet]
-        public IActionResult Predict([FromBody] Base64Image img, IHostingEnvironment env)
+        [HttpPost("predict")]
+        public IActionResult Predict([FromBody] Base64Image img)
         {
             if (img == null) return NoContent();
             var imgStream = new Bitmap(new MemoryStream(Convert.FromBase64String(img.Base64)));
 
-            var model = CNNModel.GetInstance("/DataSets/Training", "/DataSets/Testing", env);
+            var model = CNNModel.GetInstance("/DataSets/Training", "/DataSets/Testing", _Env);
 
             if (!model.IsTrained)
             {
-                model.BeginTraining(1000);
+                model.BeginTraining(9000);
             }
 
             var result = model.Predict(imgStream);
