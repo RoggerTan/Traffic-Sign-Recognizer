@@ -29,7 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{F061B8DB-C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrafficSignDemo", "TrafficSignDemo\TrafficSignDemo.csproj", "{B77649B6-5179-4071-8282-0C346EE231F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrafficSignRecognizer.Utils", "TrafficSignRecognizer.Utils\TrafficSignRecognizer.Utils.csproj", "{90ECC80A-217D-4133-BB15-C3D8BDB02F61}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrafficSignRecognizer.Utils", "TrafficSignRecognizer.Utils\TrafficSignRecognizer.Utils.csproj", "{90ECC80A-217D-4133-BB15-C3D8BDB02F61}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
