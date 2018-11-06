@@ -7,6 +7,7 @@ using TrafficSignRecognizer.Interfaces.Entities;
 using ConvNetSharp.Volume.Double;
 using ConvNetSharp.Volume;
 using System.Linq;
+using ConvNetSharp.Core.Serialization;
 
 namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
 {
@@ -22,7 +23,7 @@ namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
         private const int _BatchSize = 20;
         private DataSets _DataSets;
         private IHostingEnvironment _Env;
-        public bool IsTrained { get; set; }
+        public bool IsTrained { get; private set; }
 
         private CNNModel(string trainingPath, string testingPath, IHostingEnvironment env)
         {
@@ -39,6 +40,16 @@ namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
             return _Model;
         }
 
+        public static CNNModel GetInstance(string trainingPath, string testingPath, string json, IHostingEnvironment env = null)
+        {
+            if (_Model == null) _Model = new CNNModel(trainingPath, testingPath, env);
+
+            _Model.IsTrained = true;
+            _Model._Net = SerializationExtensions.FromJson<double>(json);
+
+            return _Model;
+        }
+
         public TrafficSignInfo Predict(Bitmap img)
         {
             var volume = BuilderInstance.Volume.From(img.GetColorBytesFromBitmap(_Env, _ImgWidth, _ImgHeight).Select(x => (double)x).ToArray(), new Shape(_ImgWidth, _ImgHeight));
@@ -49,6 +60,11 @@ namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
             {
                 Label = _Net.GetPrediction()[0]
             };
+        }
+
+        public string GetSerializedNetwork()
+        {
+            return _Net.ToJson();
         }
     }
 }

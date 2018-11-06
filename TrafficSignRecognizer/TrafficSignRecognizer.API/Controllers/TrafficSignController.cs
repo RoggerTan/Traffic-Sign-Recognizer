@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Drawing;
@@ -50,6 +51,46 @@ namespace TrafficSignRecognizer.API.Controllers
             var result = model.Predict(imgStream);
 
             return new JsonResult(result);
+        }
+
+        /// <summary>
+        /// Get the network JSON data
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getnetwork")]
+        public IActionResult GetSerializedNetwork()
+        {
+            var model = CNNModel.GetInstance("/DataSets/Training", "/DataSets/Testing", _Env);
+
+            if (!model.IsTrained)
+            {
+                model.BeginTraining(9000);
+            }
+
+            return Content(model.GetSerializedNetwork());
+        }
+
+        /// <summary>
+        /// Receive JSON file (multipart) that contains network data.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        [HttpPost("loadnetwork")]
+        public async Task<IActionResult> LoadSerializedNetwork(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return Content("No file is sent!");
+
+            var fileStream = file.OpenReadStream();
+
+            var model = CNNModel.GetInstance("/DataSets/Training", "/DataSets/Testing", await new StreamReader(fileStream).ReadToEndAsync(),  _Env);
+
+            if (!model.IsTrained)
+            {
+                model.BeginTraining(9000);
+            }
+
+            return new JsonResult(new { Result = "Ok"});
         }
     }
 }
