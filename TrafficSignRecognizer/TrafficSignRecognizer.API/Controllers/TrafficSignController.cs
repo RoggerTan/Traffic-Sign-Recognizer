@@ -67,7 +67,13 @@ namespace TrafficSignRecognizer.API.Controllers
                 model.BeginTraining(9000);
             }
 
-            return Content(model.GetSerializedNetwork());
+            var ms = new MemoryStream();
+            var streamWriter = new StreamWriter(ms);
+
+            streamWriter.Write(model.GetSerializedNetwork());
+            streamWriter.Close();
+
+            return File(ms.ToArray(), "application/json", "data.json");
         }
 
         /// <summary>
