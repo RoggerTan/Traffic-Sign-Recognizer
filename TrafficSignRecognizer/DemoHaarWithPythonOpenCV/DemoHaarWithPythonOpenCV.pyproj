@@ -5,12 +5,13 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectTypeGuids>{a41c8ea1-112a-4a2d-9f91-29557995525f};{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>classifier.py</StartupFile>
+    <StartupFile>download-image-by-link.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <InterpreterId>CondaEnv|CondaEnv|OpenCV</InterpreterId>
+    <ProjectGuid>{86c85efb-da40-4805-8424-9b7fcd8146ac}</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,7 +22,10 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="classifier.py" />
+    <Compile Include="cls_function.py" />
+    <Compile Include="download-image-by-link.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="CondaEnv|CondaEnv|OpenCV" />
