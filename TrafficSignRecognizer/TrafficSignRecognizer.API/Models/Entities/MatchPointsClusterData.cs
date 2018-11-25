@@ -4,12 +4,10 @@ namespace TrafficSignRecognizer.API.Models.Entities
 {
     public class MatchPointsClusterData
     {
-        [Column("0")]
-        [ColumnName("Label")]
-        public string Id;
+        [Column("0", "Label")]
+        public string Id { get; set; }
 
-        [Column("1")]
-        [ColumnName("Quantity")]
-        public float PointQuantity;
+        [Column("1", "Quantity")]
+        public float PointQuantity { get; set; }
     }
 }
