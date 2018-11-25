@@ -168,25 +168,25 @@ namespace TrafficSignRecognizer.Utils
         private static double BlueDistanceLimit = 0;
         private static double YellowDistanceLimit = 0;
         private static double BlackDistanceLimit = 0;
-        private const double DistanceLimit = 10000;
+        private const double DistanceLimit = 500;
 
         public static IEnumerable<SpeededUpRobustFeaturePoint> FilteringPointsByColor(Bitmap bitmap, IEnumerable<SpeededUpRobustFeaturePoint> points, params Color[] colors)
         {
             //Calculate color distance limit first
-            if (RedDistanceLimit == 0)
-            {
-                RedDistanceLimit = ColorDistance(Color.FromArgb(255, 122, 76), Color.FromArgb(236, 29, 36));
-                WhiteDistanceLimit = ColorDistance(Color.FromArgb(167, 167, 167), Color.FromArgb(255, 255, 255));
-                BlueDistanceLimit = ColorDistance(Color.FromArgb(0, 255, 246), Color.FromArgb(0, 121, 193));
-                YellowDistanceLimit = ColorDistance(Color.FromArgb(216, 255, 0), Color.FromArgb(247, 212, 23));
-                BlackDistanceLimit = ColorDistance(Color.FromArgb(89, 89, 89), Color.FromArgb(0, 0, 0));
-            }
+            //if (RedDistanceLimit == 0)
+            //{
+            //    RedDistanceLimit = ColorDistance(Color.FromArgb(255, 122, 76), Color.FromArgb(236, 29, 36));
+            //    WhiteDistanceLimit = ColorDistance(Color.FromArgb(167, 167, 167), Color.FromArgb(255, 255, 255));
+            //    BlueDistanceLimit = ColorDistance(Color.FromArgb(0, 255, 246), Color.FromArgb(0, 121, 193));
+            //    YellowDistanceLimit = ColorDistance(Color.FromArgb(216, 255, 0), Color.FromArgb(247, 212, 23));
+            //    BlackDistanceLimit = ColorDistance(Color.FromArgb(89, 89, 89), Color.FromArgb(0, 0, 0));
+            //}
 
-            foreach(var point in points)
+            foreach (var point in points)
             {
                 var pointColor = bitmap.GetPixel((int)point.X, (int)point.Y);
 
-                foreach(var color in colors)
+                foreach (var color in colors)
                 {
                     if (color == Color.Red)
                     {
