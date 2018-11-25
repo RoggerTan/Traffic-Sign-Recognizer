@@ -1,5 +1,6 @@
-﻿using ConvNetSharp.Volume;
-using ConvNetSharp.Volume.Double;
+﻿using Accord;
+using Accord.Imaging;
+using ConvNetSharp.Volume;
 using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,6 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Threading.Tasks;
 using TrafficSignRecognizer.Interfaces.Entities;
 
 namespace TrafficSignRecognizer.Utils
@@ -114,7 +114,7 @@ namespace TrafficSignRecognizer.Utils
         {
             var absolutePath = $"{env.WebRootPath}{relativePath.Replace('/', '\\')}";
 
-            var img = Image.FromFile(absolutePath) as Bitmap;
+            var img = System.Drawing.Image.FromFile(absolutePath) as Bitmap;
 
             return GetColorBytesFromBitmap(img, env, width, height);
         }
@@ -160,7 +160,87 @@ namespace TrafficSignRecognizer.Utils
         {
             var absolutePath = $"{env.WebRootPath}{imgUrl.Replace('/', '\\')}";
 
-            return Image.FromFile(absolutePath) as Bitmap;
+            return System.Drawing.Image.FromFile(absolutePath) as Bitmap;
+        }
+
+        private static double RedDistanceLimit = 0;
+        private static double WhiteDistanceLimit = 0;
+        private static double BlueDistanceLimit = 0;
+        private static double YellowDistanceLimit = 0;
+        private static double BlackDistanceLimit = 0;
+        private const double DistanceLimit = 10000;
+
+        public static IEnumerable<SpeededUpRobustFeaturePoint> FilteringPointsByColor(Bitmap bitmap, IEnumerable<SpeededUpRobustFeaturePoint> points, params Color[] colors)
+        {
+            //Calculate color distance limit first
+            if (RedDistanceLimit == 0)
+            {
+                RedDistanceLimit = ColorDistance(Color.FromArgb(255, 122, 76), Color.FromArgb(236, 29, 36));
+                WhiteDistanceLimit = ColorDistance(Color.FromArgb(167, 167, 167), Color.FromArgb(255, 255, 255));
+                BlueDistanceLimit = ColorDistance(Color.FromArgb(0, 255, 246), Color.FromArgb(0, 121, 193));
+                YellowDistanceLimit = ColorDistance(Color.FromArgb(216, 255, 0), Color.FromArgb(247, 212, 23));
+                BlackDistanceLimit = ColorDistance(Color.FromArgb(89, 89, 89), Color.FromArgb(0, 0, 0));
+            }
+
+            foreach(var point in points)
+            {
+                var pointColor = bitmap.GetPixel((int)point.X, (int)point.Y);
+
+                foreach(var color in colors)
+                {
+                    if (color == Color.Red)
+                    {
+                        if (ColorDistance(pointColor, Color.FromArgb(236, 29, 36)) <= DistanceLimit)
+                        {
+                            yield return point;
+                            break;
+                        }
+                    }
+                    else if (color == Color.White)
+                    {
+                        if (ColorDistance(pointColor, Color.FromArgb(255, 255, 255)) <= DistanceLimit)
+                        {
+                            yield return point;
+                            break;
+                        }
+                    }
+                    else if (color == Color.Blue)
+                    {
+                        if (ColorDistance(pointColor, Color.FromArgb(0, 121, 193)) <= DistanceLimit)
+                        {
+                            yield return point;
+                            break;
+                        }
+                    }
+                    else if (color == Color.Yellow)
+                    {
+                        if (ColorDistance(pointColor, Color.FromArgb(247, 212, 23)) <= DistanceLimit)
+                        {
+                            yield return point;
+                            break;
+                        }
+                    }
+                    else if (color == Color.Black)
+                    {
+                        if (ColorDistance(pointColor, Color.FromArgb(0, 0, 0)) <= DistanceLimit)
+                        {
+                            yield return point;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            double ColorDistance(Color colorA, Color colorB)
+            {
+                // Reference: https://en.wikipedia.org/wiki/Color_difference
+                return 2 * Math.Pow(colorA.R - colorB.R, 2) + 4 * Math.Pow(colorA.G - colorB.G, 2) + 3 * Math.Pow(colorA.B - colorB.B, 2);
+            }
+        }
+
+        public static Bitmap Resize(this Bitmap bitmap, int width, int height)
+        {
+            return new Bitmap(bitmap, new Size(width, height));
         }
     }
 }

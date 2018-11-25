@@ -1,8 +1,10 @@
 ﻿using Accord.Imaging;
+using Accord.Imaging.Filters;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using TrafficSignRecognizer.API.Models.Entities;
+using static TrafficSignRecognizer.Utils.BitmapUtils;
 
 namespace TrafficSignRecognizer.API.Models.ClassificationModel
 {
@@ -22,8 +24,13 @@ namespace TrafficSignRecognizer.API.Models.ClassificationModel
         public void Train(string id, Bitmap img)
         {
             var featurePoint = _surf.Transform(img);
-            if (featurePoint.Count() == 0) return;
-            _featurePoints.Add((id, featurePoint));
+
+            //A feature point should stands on a pixel which color is red, white, yellow, blue or black. These colors are traditionally used by most traffic signs. We should filter by selecting only suitable feature points.
+
+            var filteredFeaturePoint = FilteringPointsByColor(img, featurePoint, Color.Red, Color.Blue, Color.Yellow);
+
+            if (filteredFeaturePoint.Count() == 0) return;
+            _featurePoints.Add((id, filteredFeaturePoint));
         }
 
         public IEnumerable<Bitmap> GetCroppedImages(Bitmap bitmap)
@@ -51,13 +58,24 @@ namespace TrafficSignRecognizer.API.Models.ClassificationModel
 
             var predictResult = model.Predict(lstMatchPoints.First(x => x.Points.Length == maxQuantity).ToClusterData());
 
+            // For each Id (traffic sign type), we get the point group that has the most points using group by.
             var allFoundMatchPoints = lstMatchPoints
                 .Where(x => model.Predict(x.ToClusterData())
-                .SelectedClusterId == predictResult.SelectedClusterId);
+                .SelectedClusterId == predictResult.SelectedClusterId)
+                .GroupBy(x => x.Id, x => x.Points, (Id, points) =>
+                {
+                    var maxPointLength = points.Max(x => x.Length);
+
+                    return new BitmapMatchPoints
+                    {
+                        Id = Id,
+                        Points = points.First(x => x.Length == maxPointLength)
+                    };
+                });
 
             // The rectangle area is acually defined by X, Y, Width, Height. X is the x-axis of the most left-located, while Y is the y-axis of the most top-located. We can find the size by the most right and most bottom. 
 
-            foreach (var rectangle in GetRectangles(allFoundMatchPoints))
+            foreach (var (currentMatchPoints, rectangle) in GetRectangles(allFoundMatchPoints))
             {
                 var croppedBitmap = new Bitmap(rectangle.Width, rectangle.Height);
 
@@ -66,11 +84,13 @@ namespace TrafficSignRecognizer.API.Models.ClassificationModel
                     graphic.DrawImage(bitmap, new Rectangle(0, 0, rectangle.Width, rectangle.Height), rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height, GraphicsUnit.Pixel);
                 }
 
+                croppedBitmap = new PointsMarker(currentMatchPoints.Points).Apply(croppedBitmap);
+
                 yield return croppedBitmap;
             }
         }
 
-        private static IEnumerable<Rectangle> GetRectangles(IEnumerable<BitmapMatchPoints> matchPointsCollection)
+        private static IEnumerable<(BitmapMatchPoints, Rectangle)> GetRectangles(IEnumerable<BitmapMatchPoints> matchPointsCollection)
         {
             foreach (var matchPoints in matchPointsCollection)
             {
@@ -97,9 +117,9 @@ namespace TrafficSignRecognizer.API.Models.ClassificationModel
                     {
                         otherRecY = matchPoint.Y;
                     }
-
-                    yield return new Rectangle(recX, recY, otherRecX - recX, otherRecY - recY);
                 }
+
+                yield return (matchPoints, new Rectangle(recX, recY, otherRecX - recX, otherRecY - recY));
             }
         }
     }

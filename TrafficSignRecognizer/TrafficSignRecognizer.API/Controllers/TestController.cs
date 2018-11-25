@@ -96,8 +96,15 @@ namespace TrafficSignRecognizer.API.Controllers
 
             var croppedImages = surfModel.GetCroppedImages(inputBitmap);
 
-            return new JsonResult(new {
-                result = croppedImages.First().ToBase64Image().Base64
+            var results = croppedImages
+                .Select(x => x.Resize(x.Width / 2, x.Width / 2).ToBase64Image().Base64).Take(1).ToArray();
+
+            var results2 = croppedImages
+    .Select(x => x.Resize(x.Width / 2, x.Width / 2).ToBase64Image().Base64).ToArray();
+
+            return new JsonResult(new
+            {
+                results
             });
         }
     }
