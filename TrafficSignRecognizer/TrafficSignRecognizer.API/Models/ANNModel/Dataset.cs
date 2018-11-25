@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using ConvNetSharp.Volume;
+﻿using ConvNetSharp.Volume;
 using ConvNetSharp.Volume.Double;
 using Microsoft.AspNetCore.Hosting;
-using TrafficSignRecognizer.Utils;
+using System;
+using System.Collections.Generic;
 using TrafficSignRecognizer.Interfaces.Entities;
+using TrafficSignRecognizer.Utils;
 
 namespace TrafficSignRecognizer.API.Models.ANNModel
 {
     public class DataSet
     {
-        private readonly List<TrafficSignInfo> _trainImages;
+        public List<TrafficSignInfo> TrainImages { get; private set; }
         private readonly Random _random = new Random(RandomUtilities.Seed);
         private int _start;
         private int _epochCompleted;
@@ -20,7 +19,7 @@ namespace TrafficSignRecognizer.API.Models.ANNModel
 
         public DataSet(List<TrafficSignInfo> trainImages, int width, int height)
         {
-            _trainImages = trainImages;
+            TrainImages = trainImages;
             _Width = width;
             _Height = height;
         }
@@ -39,12 +38,12 @@ namespace TrafficSignRecognizer.API.Models.ANNModel
             // Shuffle for the first epoch
             if (_start == 0 && _epochCompleted == 0)
             {
-                for (var i = _trainImages.Count - 1; i >= 0; i--)
+                for (var i = TrainImages.Count - 1; i >= 0; i--)
                 {
                     var j = _random.Next(i);
-                    var temp = _trainImages[j];
-                    _trainImages[j] = _trainImages[i];
-                    _trainImages[i] = temp;
+                    var temp = TrainImages[j];
+                    TrainImages[j] = TrainImages[i];
+                    TrainImages[i] = temp;
                 }
             }
 
@@ -52,7 +51,7 @@ namespace TrafficSignRecognizer.API.Models.ANNModel
 
             for (var i = 0; i < batchSize; i++)
             {
-                var entry = _trainImages[_start];
+                var entry = TrainImages[_start];
 
                 labels[i] = entry.Label;
 
@@ -61,7 +60,7 @@ namespace TrafficSignRecognizer.API.Models.ANNModel
                 label[i * numClasses + entry.Label] = 1.0;
 
                 _start++;
-                if (_start == _trainImages.Count)
+                if (_start == TrainImages.Count)
                 {
                     _start = 0;
                     _epochCompleted++;

@@ -155,5 +155,12 @@ namespace TrafficSignRecognizer.Utils
                 }
             }
         }
+
+        public static Bitmap GetBitmapFromBitmapUrl(string imgUrl, IHostingEnvironment env)
+        {
+            var absolutePath = $"{env.WebRootPath}{imgUrl.Replace('/', '\\')}";
+
+            return Image.FromFile(absolutePath) as Bitmap;
+        }
     }
 }

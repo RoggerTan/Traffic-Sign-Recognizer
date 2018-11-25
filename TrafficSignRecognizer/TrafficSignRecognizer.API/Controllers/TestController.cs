@@ -4,6 +4,10 @@ using TrafficSignRecognizer.API.Models.Storages;
 using TrafficSignRecognizer.Utils;
 using TrafficSignRecognizer.Interfaces.Entities;
 using static TrafficSignRecognizer.Utils.MatrixUtils;
+using TrafficSignRecognizer.API.Models.ClassificationModel;
+using TrafficSignRecognizer.API.Models.ANNModel.Utils;
+using Microsoft.AspNetCore.Hosting;
+using static TrafficSignRecognizer.Utils.BitmapUtils;
 
 namespace TrafficSignRecognizer.API.Controllers
 {
@@ -11,6 +15,13 @@ namespace TrafficSignRecognizer.API.Controllers
     [ApiController]
     public class TestController : ControllerBase
     {
+        private IHostingEnvironment _env;
+
+        public TestController(IHostingEnvironment env)
+        {
+            _env = env;
+        }
+
         [HttpPost("tograyscale")]
         public IActionResult ToGrayScale([FromBody] Base64Image img)
         {
@@ -66,6 +77,27 @@ namespace TrafficSignRecognizer.API.Controllers
             {
                 Value = emurator.Current.ToArray(),
                 EndRow = endRow
+            });
+        }
+
+        [HttpPost("surfrect")]
+        public IActionResult SurfRectangle([FromBody] Base64Image image)
+        {
+            if (image == null) return NoContent();
+
+            var inputBitmap = image.Base64.ToBitmap();
+
+            var surfModel = new SURFMatchingModel();
+
+            foreach (var trainData in CNNModel.GetInstance("/DataSets/Training", "/DataSets/Testing", _env).DataSets.Train.TrainImages)
+            {
+                surfModel.Train(trainData.Id, GetBitmapFromBitmapUrl(trainData.ImgUrl, _env));
+            }
+
+            var croppedImages = surfModel.GetCroppedImages(inputBitmap);
+
+            return new JsonResult(new {
+                result = croppedImages.First().ToBase64Image().Base64
             });
         }
     }

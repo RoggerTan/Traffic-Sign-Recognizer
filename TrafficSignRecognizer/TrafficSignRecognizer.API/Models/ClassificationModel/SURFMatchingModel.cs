@@ -1,13 +1,7 @@
 ﻿using Accord.Imaging;
-using Accord.MachineLearning.VectorMachines;
-using Accord.Statistics.Kernels;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Threading.Tasks;
-using Accord.Imaging.Filters;
-using Microsoft.ML.Trainers;
 using TrafficSignRecognizer.API.Models.Entities;
 
 namespace TrafficSignRecognizer.API.Models.ClassificationModel
@@ -22,14 +16,17 @@ namespace TrafficSignRecognizer.API.Models.ClassificationModel
         {
             _surf = new SpeededUpRobustFeaturesDetector();
             _matcher = new KNearestNeighborMatching(5);
+            _featurePoints = new List<(string id, IEnumerable<SpeededUpRobustFeaturePoint> featurePoints)>();
         }
 
         public void Train(string id, Bitmap img)
         {
-            _featurePoints.Add((id, _surf.Transform(img)));
+            var featurePoint = _surf.Transform(img);
+            if (featurePoint.Count() == 0) return;
+            _featurePoints.Add((id, featurePoint));
         }
 
-        public Bitmap GetCroppedImage(Bitmap bitmap)
+        public IEnumerable<Bitmap> GetCroppedImages(Bitmap bitmap)
         {
             var pointData = _surf.Transform(bitmap);
 
@@ -40,22 +37,70 @@ namespace TrafficSignRecognizer.API.Models.ClassificationModel
             {
                 var matchPoints = _matcher.Match(trainedMatchPoint.featurePoints, pointData);
 
-                lstMatchPoints.Add(new BitmapMatchPoints(trainedMatchPoint.id, matchPoints[0]));
+                // matchPoints[1] means a collection of match points with coordinates based on the pointData
+                lstMatchPoints.Add(new BitmapMatchPoints {
+                    Id = trainedMatchPoint.id,
+                    Points = matchPoints[1]
+                });
             }
 
-            var model = new KMeansClusterModel<BitmapMatchPoints, BitmapMatchPointPrediction>(2);
-            model.Train(lstMatchPoints);
+            var model = new KMeansClusterModel<MatchPointsClusterData, BitmapMatchPointPrediction>(2);
+            model.Train(lstMatchPoints.Select(x => x.ToClusterData()));
 
-            var maxQuantity = lstMatchPoints.Max(y => y.Quantity);
+            var maxQuantity = lstMatchPoints.Max(y => y.Points.Length);
 
-            var predictResult = model.Predict(lstMatchPoints.First(x => x.Quantity == maxQuantity));
+            var predictResult = model.Predict(lstMatchPoints.First(x => x.Points.Length == maxQuantity).ToClusterData());
 
             var allFoundMatchPoints = lstMatchPoints
-                .Where(x => model.Predict(x)
+                .Where(x => model.Predict(x.ToClusterData())
                 .SelectedClusterId == predictResult.SelectedClusterId);
 
             // The rectangle area is acually defined by X, Y, Width, Height. X is the x-axis of the most left-located, while Y is the y-axis of the most top-located. We can find the size by the most right and most bottom. 
 
+            foreach (var rectangle in GetRectangles(allFoundMatchPoints))
+            {
+                var croppedBitmap = new Bitmap(rectangle.Width, rectangle.Height);
+
+                using (var graphic = Graphics.FromImage(croppedBitmap))
+                {
+                    graphic.DrawImage(bitmap, new Rectangle(0, 0, rectangle.Width, rectangle.Height), rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height, GraphicsUnit.Pixel);
+                }
+
+                yield return croppedBitmap;
+            }
+        }
+
+        private static IEnumerable<Rectangle> GetRectangles(IEnumerable<BitmapMatchPoints> matchPointsCollection)
+        {
+            foreach (var matchPoints in matchPointsCollection)
+            {
+                int recX = 0, recY = 0, otherRecX = 0, otherRecY = 0;
+
+                foreach(var matchPoint in matchPoints.Points)
+                {
+                    if (matchPoint.X < recX)
+                    {
+                        recX = matchPoint.X;
+                    }
+
+                    if (matchPoint.Y < recY)
+                    {
+                        recY = matchPoint.Y;
+                    }
+
+                    if (matchPoint.X > otherRecX)
+                    {
+                        otherRecX = matchPoint.X;
+                    }
+
+                    if (matchPoint.Y > otherRecY)
+                    {
+                        otherRecY = matchPoint.Y;
+                    }
+
+                    yield return new Rectangle(recX, recY, otherRecX - recX, otherRecY - recY);
+                }
+            }
         }
     }
 }

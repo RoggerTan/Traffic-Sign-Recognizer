@@ -3,13 +3,8 @@ using Microsoft.ML.Core.Data;
 using Microsoft.ML.Runtime.Api;
 using Microsoft.ML.Runtime.Data;
 using Microsoft.ML.Trainers.KMeans;
-using Microsoft.ML.Transforms.Categorical;
-using Microsoft.ML.Transforms.Projections;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using TrafficSignRecognizer.API.Models.Entities;
 
 namespace TrafficSignRecognizer.API.Models
 {
@@ -28,9 +23,10 @@ namespace TrafficSignRecognizer.API.Models
         public KMeansClusterModel(int clusterCount)
         {
             ClusterCount = clusterCount;
-            _mLContext = new MLContext(1);
-            _trainer = new KMeansPlusPlusTrainer(_mLContext, "Quantity", clusterCount);
-            _pipeline = _mLContext.Transforms.KeepColumns("Quantity")
+            _mLContext = new MLContext();
+            //_trainer = new KMeansPlusPlusTrainer(_mLContext, "Quantity", clusterCount);
+            _trainer = _mLContext.Clustering.Trainers.KMeans("Quantity", clustersCount: clusterCount);
+            _pipeline = _mLContext.Transforms.Concatenate("Quantity", "Quantity")
                 .Append(_trainer);
         }
 

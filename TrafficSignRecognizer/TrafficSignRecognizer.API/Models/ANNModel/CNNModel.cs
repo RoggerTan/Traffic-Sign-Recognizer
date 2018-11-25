@@ -21,7 +21,7 @@ namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
         private readonly string _TrainingPath;
         private readonly string _TestingPath;
         private const int _BatchSize = 20;
-        private DataSets _DataSets;
+        public DataSets DataSets { get; set; }
         private IHostingEnvironment _Env;
         public bool IsTrained { get; private set; }
 

@@ -13,7 +13,7 @@ namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
 
             do
             {
-                var trainSample = _DataSets.Train.NextBatch(_BatchSize, _Env);
+                var trainSample = DataSets.Train.NextBatch(_BatchSize, _Env);
                 Train(trainSample.Item1, trainSample.Item2);
                 loopCount++;
             } while (loopCount < totalBatchSize/_BatchSize);
