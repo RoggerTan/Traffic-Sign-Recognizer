@@ -1,5 +1,6 @@
 ﻿using Accord.Imaging;
 using Accord.Imaging.Filters;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace TrafficSignRecognizer.API.Models.ClassificationModel
 
         public SURFMatchingModel()
         {
-            _surf = new SpeededUpRobustFeaturesDetector(threshold: 0.0001f);
+            _surf = new SpeededUpRobustFeaturesDetector();
             _matcher = new KNearestNeighborMatching(5);
             _featurePoints = new List<(string id, IEnumerable<SpeededUpRobustFeaturePoint> featurePoints)>();
         }
@@ -51,13 +52,13 @@ namespace TrafficSignRecognizer.API.Models.ClassificationModel
 
                 try
                 {
-                    estimator.Estimate(matchPoints[0], matchPoints[1]);
+                    estimator.Fit(matchPoints[0], matchPoints[1]);
 
                     // matchPoints[1] means a collection of match points with coordinates based on the pointData
                     lstMatchPoints.Add(new BitmapMatchPoints
                     {
                         Id = trainedMatchPoint.id,
-                        Points = estimator.Plot(matchPoints[1])
+                        Points = estimator.PlotMinimumArea(matchPoints[1], 8)
                     });
                 }
                 catch
@@ -66,27 +67,47 @@ namespace TrafficSignRecognizer.API.Models.ClassificationModel
                 }
             }
 
-            var model = new KMeansClusterModel<MatchPointsClusterData, BitmapMatchPointPrediction>(2);
-            model.Train(lstMatchPoints.Select(x => x.ToClusterData()));
+            IEnumerable<BitmapMatchPoints> allFoundMatchPoints = null;
 
-            var maxQuantity = lstMatchPoints.Max(y => y.Points.Length);
+            try
+            {
+                var model = new KMeansClusterModel<MatchPointsClusterData, BitmapMatchPointPrediction>(2);
+                model.Train(lstMatchPoints.Select(x => x.ToClusterData()));
 
-            var predictResult = model.Predict(lstMatchPoints.First(x => x.Points.Length == maxQuantity).ToClusterData());
+                var maxQuantity = lstMatchPoints.Max(y => y.Points.Length);
 
-            // For each Id (traffic sign type), we get the point group that has the most points using group by.
-            var allFoundMatchPoints = lstMatchPoints
-                .Where(x => model.Predict(x.ToClusterData())
-                .SelectedClusterId == predictResult.SelectedClusterId)
-                .GroupBy(x => x.Id, x => x.Points, (Id, points) =>
-                {
-                    var maxPointLength = points.Max(x => x.Length);
+                var predictResult = model.Predict(lstMatchPoints.First(x => x.Points.Length == maxQuantity).ToClusterData());
 
-                    return new BitmapMatchPoints
+                // For each Id (traffic sign type), we get the point group that has the most points using group by.
+                allFoundMatchPoints = lstMatchPoints
+                    .Where(x => model.Predict(x.ToClusterData())
+                    .SelectedClusterId == predictResult.SelectedClusterId)
+                    .GroupBy(x => x.Id, x => x.Points, (Id, points) =>
                     {
-                        Id = Id,
-                        Points = points.First(x => x.Length == maxPointLength)
-                    };
-                });
+                        var maxPointLength = points.Max(x => x.Length);
+
+                        return new BitmapMatchPoints
+                        {
+                            Id = Id,
+                            Points = points.First(x => x.Length == maxPointLength)
+                        };
+                    });
+            }
+            // Catch when too few training data for kmeans. In that case, select all
+            catch (InvalidOperationException)
+            {
+                allFoundMatchPoints = lstMatchPoints
+                    .GroupBy(x => x.Id, x => x.Points, (Id, points) =>
+                    {
+                        var maxPointLength = points.Max(x => x.Length);
+
+                        return new BitmapMatchPoints
+                        {
+                            Id = Id,
+                            Points = points.First(x => x.Length == maxPointLength)
+                        };
+                    });
+            }
 
             // The rectangle area is acually defined by X, Y, Width, Height. X is the x-axis of the most left-located, while Y is the y-axis of the most top-located. We can find the size by the most right and most bottom. 
 
