@@ -8,6 +8,7 @@ using ConvNetSharp.Volume.Double;
 using ConvNetSharp.Volume;
 using System.Linq;
 using ConvNetSharp.Core.Serialization;
+using System.Collections.Generic;
 
 namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
 {
@@ -60,6 +61,21 @@ namespace TrafficSignRecognizer.API.Models.ANNModel.Utils
             {
                 Label = _Net.GetPrediction()[0]
             };
+        }
+
+        public IEnumerable<TrafficSignInfo> PredictMultiple (Bitmap img)
+        {
+            var volume = BuilderInstance.Volume.From(img.GetColorBytesFromBitmap(_Env, _ImgWidth, _ImgHeight).Select(x => (double)x).ToArray(), new Shape(_ImgWidth, _ImgHeight));
+
+            _Net.Forward(volume);
+
+            foreach(var result in _Net.GetPrediction())
+            {
+                yield return new TrafficSignInfo
+                {
+                    Label = result
+                };
+            }
         }
 
         public string GetSerializedNetwork()

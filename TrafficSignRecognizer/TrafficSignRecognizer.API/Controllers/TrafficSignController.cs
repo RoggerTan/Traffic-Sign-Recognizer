@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using TrafficSignRecognizer.API.Models.ANNModel.Utils;
 using TrafficSignRecognizer.Interfaces.Entities;
@@ -48,9 +49,11 @@ namespace TrafficSignRecognizer.API.Controllers
                 model.BeginTraining(9000);
             }
 
-            var result = model.Predict(imgStream);
+            var result = model.PredictMultiple(imgStream);
 
-            return new JsonResult(result);
+            return new JsonResult(new {
+                result = result.ToArray()
+            });
         }
 
         /// <summary>

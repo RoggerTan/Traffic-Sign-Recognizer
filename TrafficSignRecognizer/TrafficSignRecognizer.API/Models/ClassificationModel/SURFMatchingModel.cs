@@ -17,7 +17,7 @@ namespace TrafficSignRecognizer.API.Models.ClassificationModel
 
         public SURFMatchingModel()
         {
-            _surf = new SpeededUpRobustFeaturesDetector();
+            _surf = new SpeededUpRobustFeaturesDetector(0.000001f);
             _matcher = new KNearestNeighborMatching(5);
             _featurePoints = new List<(string id, IEnumerable<SpeededUpRobustFeaturePoint> featurePoints)>();
         }

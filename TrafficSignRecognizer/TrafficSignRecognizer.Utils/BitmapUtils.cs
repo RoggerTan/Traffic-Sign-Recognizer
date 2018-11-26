@@ -196,6 +196,7 @@ namespace TrafficSignRecognizer.Utils
                             break;
                         }
                     }
+
                     else if (color == Color.White)
                     {
                         if (ColorDistance(pointColor, Color.FromArgb(255, 255, 255)) <= DistanceLimit)
@@ -204,6 +205,7 @@ namespace TrafficSignRecognizer.Utils
                             break;
                         }
                     }
+
                     else if (color == Color.Blue)
                     {
                         if (ColorDistance(pointColor, Color.FromArgb(0, 121, 193)) <= DistanceLimit)
@@ -212,6 +214,7 @@ namespace TrafficSignRecognizer.Utils
                             break;
                         }
                     }
+
                     else if (color == Color.Yellow)
                     {
                         if (ColorDistance(pointColor, Color.FromArgb(247, 212, 23)) <= DistanceLimit)
@@ -220,6 +223,7 @@ namespace TrafficSignRecognizer.Utils
                             break;
                         }
                     }
+
                     else if (color == Color.Black)
                     {
                         if (ColorDistance(pointColor, Color.FromArgb(0, 0, 0)) <= DistanceLimit)
