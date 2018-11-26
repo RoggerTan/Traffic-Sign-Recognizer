@@ -16,7 +16,7 @@ namespace TrafficSignRecognizer.API.Models.ClassificationModel
 
         public SURFMatchingModel()
         {
-            _surf = new SpeededUpRobustFeaturesDetector();
+            _surf = new SpeededUpRobustFeaturesDetector(threshold: 0.0001f);
             _matcher = new KNearestNeighborMatching(5);
             _featurePoints = new List<(string id, IEnumerable<SpeededUpRobustFeaturePoint> featurePoints)>();
         }
@@ -44,11 +44,26 @@ namespace TrafficSignRecognizer.API.Models.ClassificationModel
             {
                 var matchPoints = _matcher.Match(trainedMatchPoint.featurePoints, pointData);
 
-                // matchPoints[1] means a collection of match points with coordinates based on the pointData
-                lstMatchPoints.Add(new BitmapMatchPoints {
-                    Id = trainedMatchPoint.id,
-                    Points = matchPoints[1]
-                });
+                var estimator = new RANSACEstimator();
+
+                //if (matchPoints.Any(x => x.Length < 4))
+                //    continue;
+
+                try
+                {
+                    estimator.Estimate(matchPoints[0], matchPoints[1]);
+
+                    // matchPoints[1] means a collection of match points with coordinates based on the pointData
+                    lstMatchPoints.Add(new BitmapMatchPoints
+                    {
+                        Id = trainedMatchPoint.id,
+                        Points = estimator.Plot(matchPoints[1])
+                    });
+                }
+                catch
+                {
+
+                }
             }
 
             var model = new KMeansClusterModel<MatchPointsClusterData, BitmapMatchPointPrediction>(2);
