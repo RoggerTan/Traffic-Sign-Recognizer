@@ -13,7 +13,7 @@ namespace TrafficSignRecognizer.API.Models
 
         public RANSACEstimator()
         {
-            _ransac = new RansacHomographyEstimator(0.0001, 0.60);
+            _ransac = new RansacHomographyEstimator(6, 1);
         }
 
         public void Fit(IntPoint[] points1, IntPoint[] points2)

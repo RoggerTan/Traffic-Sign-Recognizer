@@ -184,6 +184,8 @@ namespace TrafficSignRecognizer.Utils
 
             foreach (var point in points)
             {
+                yield return point;
+                continue;
                 var pointColor = bitmap.GetPixel((int)point.X, (int)point.Y);
 
                 foreach (var color in colors)
