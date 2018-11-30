@@ -17,7 +17,7 @@ namespace TrafficSignRecognizer.API.Models.ClassificationModel
 
         public SURFMatchingModel()
         {
-            _surf = new SpeededUpRobustFeaturesDetector(0.000001f);
+            _surf = new SpeededUpRobustFeaturesDetector();
             _matcher = new KNearestNeighborMatching(5);
             _featurePoints = new List<(string id, IEnumerable<SpeededUpRobustFeaturePoint> featurePoints)>();
         }
@@ -108,6 +108,19 @@ namespace TrafficSignRecognizer.API.Models.ClassificationModel
                         };
                     });
             }
+
+            //Mean Shift filter
+            var meanShiftFilter = new MeanShiftFilter(3);
+            var meanShiftFilterResult = new List<BitmapMatchPoints>(lstMatchPoints.Count);
+
+            foreach(var points in allFoundMatchPoints)
+            {
+                meanShiftFilter.Fit(points.Points);
+                if (meanShiftFilter.Predict())
+                    meanShiftFilterResult.Add(points);
+            }
+
+            allFoundMatchPoints = meanShiftFilterResult;
 
             // The rectangle area is acually defined by X, Y, Width, Height. X is the x-axis of the most left-located, while Y is the y-axis of the most top-located. We can find the size by the most right and most bottom. 
 
