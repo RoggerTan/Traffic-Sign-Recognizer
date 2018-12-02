@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using TrafficSignRecognizer.Interfaces.Entities;
+using static TrafficSignRecognizer.Utils.PointUtils;
 
 namespace TrafficSignRecognizer.Utils
 {
@@ -163,14 +164,14 @@ namespace TrafficSignRecognizer.Utils
             return System.Drawing.Image.FromFile(absolutePath) as Bitmap;
         }
 
-        private static double RedDistanceLimit = 0;
-        private static double WhiteDistanceLimit = 0;
-        private static double BlueDistanceLimit = 0;
-        private static double YellowDistanceLimit = 0;
-        private static double BlackDistanceLimit = 0;
-        private const double DistanceLimit = 500;
+        //private static double RedDistanceLimit = 0;
+        //private static double WhiteDistanceLimit = 0;
+        //private static double BlueDistanceLimit = 0;
+        //private static double YellowDistanceLimit = 0;
+        //private static double BlackDistanceLimit = 0;
+        //private static readonly double DistanceLimit = 300;
 
-        public static IEnumerable<SpeededUpRobustFeaturePoint> FilteringPointsByColor(Bitmap bitmap, IEnumerable<SpeededUpRobustFeaturePoint> points, params Color[] colors)
+        public static IEnumerable<SpeededUpRobustFeaturePoint> FilteringPointsByColor(Bitmap bitmap, int colorDistance, IEnumerable<SpeededUpRobustFeaturePoint> points, params Color[] colors)
         {
             //Calculate color distance limit first
             //if (RedDistanceLimit == 0)
@@ -184,64 +185,141 @@ namespace TrafficSignRecognizer.Utils
 
             foreach (var point in points)
             {
-                yield return point;
-                continue;
-                var pointColor = bitmap.GetPixel((int)point.X, (int)point.Y);
+                //Get all surrounding points
 
-                foreach (var color in colors)
+                foreach (var surroundPoint in FindSurroundingPoints((int)point.X, (int)point.Y, bitmap.Width, bitmap.Height, 10))
                 {
-                    if (color == Color.Red)
+                    var isValidPoint = false;
+
+                    var pointColor = bitmap.GetPixel(surroundPoint.X, surroundPoint.Y);
+
+                    foreach (var color in colors)
                     {
-                        if (ColorDistance(pointColor, Color.FromArgb(236, 29, 36)) <= DistanceLimit)
+                        if (color == Color.Red)
                         {
-                            yield return point;
-                            break;
+                            if (ColorDistance(pointColor, Color.FromArgb(236, 29, 36)) <= colorDistance)
+                            {
+                                yield return point;
+                                isValidPoint = true;
+                                break;
+                            }
+                        }
+
+                        else if (color == Color.White)
+                        {
+                            if (ColorDistance(pointColor, Color.FromArgb(255, 255, 255)) <= colorDistance)
+                            {
+                                yield return point;
+                                isValidPoint = true;
+                                break;
+                            }
+                        }
+
+                        else if (color == Color.Blue)
+                        {
+                            if (ColorDistance(pointColor, Color.FromArgb(0, 121, 193)) <= colorDistance)
+                            {
+                                yield return point;
+                                isValidPoint = true;
+                                break;
+                            }
+                        }
+
+                        else if (color == Color.Yellow)
+                        {
+                            if (ColorDistance(pointColor, Color.FromArgb(247, 212, 23)) <= colorDistance)
+                            {
+                                yield return point;
+                                isValidPoint = true;
+                                break;
+                            }
+                        }
+
+                        else if (color == Color.Black)
+                        {
+                            if (ColorDistance(pointColor, Color.FromArgb(0, 0, 0)) <= colorDistance)
+                            {
+                                yield return point;
+                                isValidPoint = true;
+                                break;
+                            }
                         }
                     }
 
-                    else if (color == Color.White)
-                    {
-                        if (ColorDistance(pointColor, Color.FromArgb(255, 255, 255)) <= DistanceLimit)
-                        {
-                            yield return point;
-                            break;
-                        }
-                    }
-
-                    else if (color == Color.Blue)
-                    {
-                        if (ColorDistance(pointColor, Color.FromArgb(0, 121, 193)) <= DistanceLimit)
-                        {
-                            yield return point;
-                            break;
-                        }
-                    }
-
-                    else if (color == Color.Yellow)
-                    {
-                        if (ColorDistance(pointColor, Color.FromArgb(247, 212, 23)) <= DistanceLimit)
-                        {
-                            yield return point;
-                            break;
-                        }
-                    }
-
-                    else if (color == Color.Black)
-                    {
-                        if (ColorDistance(pointColor, Color.FromArgb(0, 0, 0)) <= DistanceLimit)
-                        {
-                            yield return point;
-                            break;
-                        }
-                    }
+                    if (isValidPoint) break;
                 }
             }
+        }
 
-            double ColorDistance(Color colorA, Color colorB)
+        public static void ReplaceNoisePixelColor(Bitmap bitmap, Color replacingColor, int colorDistance, params Color[] colors)
+        {
+            var validColor = false;
+
+            for (var i = 0; i < bitmap.Width; i++)
             {
-                // Reference: https://en.wikipedia.org/wiki/Color_difference
-                return 2 * Math.Pow(colorA.R - colorB.R, 2) + 4 * Math.Pow(colorA.G - colorB.G, 2) + 3 * Math.Pow(colorA.B - colorB.B, 2);
+                for (var j = 0; j < bitmap.Height; j++)
+                {
+                    var pointColor = bitmap.GetPixel(i, j);
+                    validColor = false;
+
+                    foreach (var color in colors)
+                    {
+                        if (color == Color.Red)
+                        {
+                            if (ColorDistance(pointColor, Color.FromArgb(236, 29, 36)) <= colorDistance)
+                            {
+                                validColor = true;
+                                break;
+                            }
+                        }
+
+                        else if (color == Color.White)
+                        {
+                            if (ColorDistance(pointColor, Color.FromArgb(255, 255, 255)) <= colorDistance)
+                            {
+                                validColor = true;
+                                break;
+                            }
+                        }
+
+                        else if (color == Color.Blue)
+                        {
+                            if (ColorDistance(pointColor, Color.FromArgb(0, 121, 193)) <= colorDistance)
+                            {
+                                validColor = true;
+                                break;
+                            }
+                        }
+
+                        else if (color == Color.Yellow)
+                        {
+                            if (ColorDistance(pointColor, Color.FromArgb(247, 212, 23)) <= colorDistance)
+                            {
+                                validColor = true;
+                                break;
+                            }
+                        }
+
+                        else if (color == Color.Black)
+                        {
+                            if (ColorDistance(pointColor, Color.FromArgb(0, 0, 0)) <= colorDistance)
+                            {
+                                validColor = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!validColor)
+                        bitmap.SetPixel(i, j, replacingColor);
+                }
             }
+        }
+
+        public static double ColorDistance(Color colorA, Color colorB)
+        {
+            // Reference: https://en.wikipedia.org/wiki/Color_difference
+            return 2 * Math.Pow(colorA.R - colorB.R, 2) + 4 * Math.Pow(colorA.G - colorB.G, 2) + 3 * Math.Pow(colorA.B - colorB.B, 2);
         }
 
         public static Bitmap Resize(this Bitmap bitmap, int width, int height)

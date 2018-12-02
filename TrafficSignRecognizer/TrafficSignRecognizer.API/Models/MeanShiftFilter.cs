@@ -10,10 +10,12 @@ namespace TrafficSignRecognizer.API.Models
         public MeanShift MeanShift { get; private set; }
         public int MinimumPointsInCluster { get; private set; }
         public double[][] Points { get; private set; }
+        public int ClusterCountLimit { get; set; }
 
-        public MeanShiftFilter(int minimumPointsInCluster)
+        public MeanShiftFilter(int minimumPointsInCluster, int clusterCountLimit)
         {
             MinimumPointsInCluster = minimumPointsInCluster;
+            ClusterCountLimit = clusterCountLimit;
         }
 
         public void Fit(IntPoint[] points)
@@ -21,7 +23,7 @@ namespace TrafficSignRecognizer.API.Models
             MeanShift = new MeanShift
             {
                 Kernel = new UniformKernel(),
-                Bandwidth = 30
+                Bandwidth = 40
             };
 
             Points = points.Select(x => new double[] { x.X, x.Y }).ToArray();
@@ -36,7 +38,7 @@ namespace TrafficSignRecognizer.API.Models
             var pointsInMaxDensCluster = Points
                 .Where(x => MeanShift.Clusters.Decide(x) == maxDensityCluster.Index);
 
-            return pointsInMaxDensCluster.Count() >= MinimumPointsInCluster;
+            return pointsInMaxDensCluster.Count() >= MinimumPointsInCluster && MeanShift.Clusters.Count <= ClusterCountLimit;
         }
     }
 }

@@ -28,7 +28,7 @@ namespace TrafficSignRecognizer.API.Models.ClassificationModel
 
             //A feature point should stands on a pixel which color is red, white, yellow, blue or black. These colors are traditionally used by most traffic signs. We should filter by selecting only suitable feature points.
 
-            var filteredFeaturePoint = FilteringPointsByColor(img, featurePoint, Color.Red, Color.Blue, Color.Yellow);
+            var filteredFeaturePoint = FilteringPointsByColor(img, 40000, featurePoint, Color.Red, Color.Blue, Color.Yellow);
 
             if (filteredFeaturePoint.Count() == 0) return;
             _featurePoints.Add((id, filteredFeaturePoint));
@@ -36,6 +36,9 @@ namespace TrafficSignRecognizer.API.Models.ClassificationModel
 
         public IEnumerable<Bitmap> GetCroppedImages(Bitmap bitmap)
         {
+            //Remove noise color
+            ReplaceNoisePixelColor(bitmap, Color.Black, 40000, Color.Red, Color.Blue, Color.Yellow, Color.White);
+
             var pointData = _surf.Transform(bitmap);
 
             var lstMatchPoints = new List<BitmapMatchPoints>();
@@ -69,6 +72,20 @@ namespace TrafficSignRecognizer.API.Models.ClassificationModel
 
             IEnumerable<BitmapMatchPoints> allFoundMatchPoints = null;
 
+            //Mean Shift filter
+            //var meanshiftfilter = new meanshiftfilter(4, 2);
+            //var meanshiftfilterresult = new list<bitmapmatchpoints>(lstmatchpoints.count);
+
+            //foreach (var points in lstmatchpoints)
+            //{
+            //    meanshiftfilter.fit(points.points);
+            //    if (meanshiftfilter.predict())
+            //        meanshiftfilterresult.add(points);
+            //}
+
+            //allfoundmatchpoints = meanshiftfilterresult;
+
+            //KMeans++ clustering
             try
             {
                 var model = new KMeansClusterModel<MatchPointsClusterData, BitmapMatchPointPrediction>(2);
@@ -109,33 +126,29 @@ namespace TrafficSignRecognizer.API.Models.ClassificationModel
                     });
             }
 
-            //Mean Shift filter
-            var meanShiftFilter = new MeanShiftFilter(3);
-            var meanShiftFilterResult = new List<BitmapMatchPoints>(lstMatchPoints.Count);
-
-            foreach(var points in allFoundMatchPoints)
-            {
-                meanShiftFilter.Fit(points.Points);
-                if (meanShiftFilter.Predict())
-                    meanShiftFilterResult.Add(points);
-            }
-
-            allFoundMatchPoints = meanShiftFilterResult;
-
-            // The rectangle area is acually defined by X, Y, Width, Height. X is the x-axis of the most left-located, while Y is the y-axis of the most top-located. We can find the size by the most right and most bottom. 
+            // The rectangle area is actually defined by X, Y, Width, Height. X is the x-axis of the most left-located, while Y is the y-axis of the most top-located. We can find the size by the most right and most bottom. 
 
             foreach (var (currentMatchPoints, rectangle) in GetRectangles(allFoundMatchPoints))
             {
-                var croppedBitmap = new Bitmap(rectangle.Width, rectangle.Height);
+                var croppedBitmap = new Crop(rectangle).Apply(bitmap);
 
-                using (var graphic = Graphics.FromImage(croppedBitmap))
+                //croppedBitmap = new PointsMarker(currentMatchPoints.Points).Apply(croppedBitmap);
+
+                var meanShift = new MeanShiftObjectDetection(Color.Black);
+
+                meanShift.Fit(croppedBitmap);
+
+                foreach (var shiftBitmap in meanShift.Predict(croppedBitmap))
                 {
-                    graphic.DrawImage(bitmap, new Rectangle(0, 0, rectangle.Width, rectangle.Height), rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height, GraphicsUnit.Pixel);
+                    var blobShape = new BlobShapeDetection(50);
+
+                    blobShape.Fit(shiftBitmap);
+
+                    foreach(var blobBitmap in blobShape.GetBitmapsCroppedByShape())
+                    {
+                        yield return blobBitmap;
+                    }
                 }
-
-                croppedBitmap = new PointsMarker(currentMatchPoints.Points).Apply(croppedBitmap);
-
-                yield return croppedBitmap;
             }
         }
 
